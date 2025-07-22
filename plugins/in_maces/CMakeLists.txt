@@ -2,4 +2,4 @@ set(src
     in_maces.c
   )
 
-FLB_PLUGIN(in_maces "${src}" "")
+  FLB_PLUGIN(in_maces "${src}" "EndpointSecurity")
