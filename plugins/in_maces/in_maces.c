@@ -18,61 +18,84 @@
  */
 
 #include <fluent-bit/flb_input_plugin.h>
+#include <fluent-bit/flb_log_event_encoder.h>
 
 #include <EndpointSecurity/EndpointSecurity.h>
 
 struct flb_maces_config {
     es_client_t *client;
     struct flb_input_instance *ins;
-};
-
-static es_handler_block_t handler =  ^(es_client_t *c, const es_message_t *msg ) {
-  printf("%s\n", "Event received");
+    struct flb_log_event_encoder *encoder;
 };
 
 static int in_maces_init(struct flb_input_instance *ins, struct flb_config *config, void *data) {
-  struct flb_maces_config *ctx = flb_calloc(1, sizeof(struct flb_maces_config));
-  if (!ctx) {
+    struct flb_maces_config *ctx = flb_calloc(1, sizeof(struct flb_maces_config));
+    if (!ctx) {
       flb_errno();
       return -1;
-  }
-
-  es_new_client_result_t res = es_new_client(&ctx->client, handler);
-  if (res != ES_NEW_CLIENT_RESULT_SUCCESS) {
-    switch(res) {
-      case ES_NEW_CLIENT_RESULT_ERR_NOT_ENTITLED:
-        flb_plg_error(ins, "Application requires 'com.apple.developer.endpoint-security.client' entitlement");
-        break;
-      case ES_NEW_CLIENT_RESULT_ERR_NOT_PERMITTED:
-        flb_plg_error(ins, "Application lacks 'Transparency, Consent, and Control (TCC)' approval");
-        break;
-      case ES_NEW_CLIENT_RESULT_ERR_NOT_PRIVILEGED:
-        flb_plg_error(ins, "Application needs to run as root");
-        break;
-      default:
-        flb_plg_error(ins, "Unknown error");
-        break;
-      // TODO: handle all documented errors in the enum
     }
-    flb_free(ctx);
-    return -1;
-  }
 
-  ctx->ins = ins;
-  flb_input_set_context(ins, ctx);
+    ctx->encoder = flb_log_event_encoder_create(FLB_LOG_EVENT_FORMAT_DEFAULT);
+    if (ctx->encoder == NULL) {
+        flb_plg_error(ins, "could not initialize event encoder");
+        flb_free(ctx);
+        return -1;
+    }
 
-  flb_plg_info(ins, "Endpoint Security Client initialized successfully");
-  es_event_type_t events[] = {ES_EVENT_TYPE_NOTIFY_EXEC};
-  es_return_t subscribed = es_subscribe(ctx->client, events, sizeof events / sizeof *events);
-  if(subscribed != ES_RETURN_SUCCESS) {
+    ctx->ins = ins;
+
+    flb_input_set_context(ins, ctx);
+
+    // This block is called by Endpoint Security for each event
+    es_handler_block_t handler = ^(es_client_t *c, const es_message_t *msg ) {
+        flb_log_event_encoder_begin_record(ctx->encoder);
+        flb_log_event_encoder_set_current_timestamp(ctx->encoder);
+        flb_log_event_encoder_append_body_cstring(
+                        ctx->encoder,
+                        "Event");
+        flb_log_event_encoder_append_body_cstring(
+                        ctx->encoder,
+                        "Encoded");
+        flb_log_event_encoder_commit_record(ctx->encoder);
+        flb_input_log_append(ins, NULL, 0,
+                                 ctx->encoder->output_buffer,
+                                 ctx->encoder->output_length);
+    };
+
+    es_new_client_result_t res = es_new_client(&ctx->client, handler);
+
+    if (res != ES_NEW_CLIENT_RESULT_SUCCESS) {
+        switch(res) {
+          case ES_NEW_CLIENT_RESULT_ERR_NOT_ENTITLED:
+            flb_plg_error(ins, "Application requires 'com.apple.developer.endpoint-security.client' entitlement");
+            break;
+          case ES_NEW_CLIENT_RESULT_ERR_NOT_PERMITTED:
+            flb_plg_error(ins, "Application lacks 'Transparency, Consent, and Control (TCC)' approval");
+            break;
+          case ES_NEW_CLIENT_RESULT_ERR_NOT_PRIVILEGED:
+            flb_plg_error(ins, "Application needs to run as root");
+            break;
+          default:
+            flb_plg_error(ins, "Unknown error");
+            break;
+          // TODO: handle all documented errors in the enum
+        }
+        flb_free(ctx);
+        return -1;
+    }
+
+    flb_plg_info(ins, "Endpoint Security Client initialized successfully");
+    es_event_type_t events[] = {ES_EVENT_TYPE_NOTIFY_EXEC};
+    es_return_t subscribed = es_subscribe(ctx->client, events, sizeof events / sizeof *events);
+    if(subscribed != ES_RETURN_SUCCESS) {
     flb_plg_error(ins, "Error subscribing to events");
     flb_free(ctx);
     return -1;
-  } else {
+    } else {
     flb_plg_info(ins, "Subscribed to events");
-  }
+    }
 
-  return 0;
+    return 0;
 }
 
 /* Plugin registration */
