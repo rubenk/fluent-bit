@@ -235,11 +235,7 @@ static int encode_es_file_t(struct flb_log_event_encoder *encoder, const es_file
     return 0;
 }
 
-static int encode_es_process_t(struct flb_log_event_encoder *encoder, const es_message_t *msg) {
-    flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "process");
-    es_process_t *process = msg->process;
+static int encode_es_process_t(struct flb_log_event_encoder *encoder, const es_process_t *process) {
     flb_log_event_encoder_body_begin_map(encoder);
     flb_log_event_encoder_append_body_values(
                     encoder,
@@ -375,7 +371,10 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
 
         flb_log_event_encoder_body_commit_map(ctx->encoder);
 
-        encode_es_process_t(ctx->encoder, msg);
+        flb_log_event_encoder_append_body_cstring(
+            ctx->encoder,
+            "process");
+        encode_es_process_t(ctx->encoder, msg->process);
         flb_log_event_encoder_append_body_values(
                         ctx->encoder,
                         FLB_LOG_EVENT_CSTRING_VALUE("global_seq_num"),
