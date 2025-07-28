@@ -152,18 +152,48 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
             .tm = msg->time
         };
         flb_log_event_encoder_set_timestamp(ctx->encoder, &timestamp);
+        flb_log_event_encoder_append_body_values(
+                        ctx->encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("event_type"),
+                        FLB_LOG_EVENT_UINT32_VALUE(msg->event_type));
+        flb_log_event_encoder_append_body_values(
+                        ctx->encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("event"),
+                        FLB_LOG_EVENT_CSTRING_VALUE(event_type_str(msg->event_type)));
         flb_log_event_encoder_append_body_cstring(
                         ctx->encoder,
-                        "event_type");
-        flb_log_event_encoder_append_body_int32(
+                        "process");
+        flb_log_event_encoder_body_begin_map(ctx->encoder);
+        es_process_t *process = msg->process;
+        flb_log_event_encoder_append_body_values(
                         ctx->encoder,
-                        msg->event_type);
-        flb_log_event_encoder_append_body_cstring(
+                        FLB_LOG_EVENT_CSTRING_VALUE("ppid"),
+                        FLB_LOG_EVENT_UINT64_VALUE(process->ppid));
+        flb_log_event_encoder_append_body_values(
                         ctx->encoder,
-                        "event");
-        flb_log_event_encoder_append_body_cstring(
+                        FLB_LOG_EVENT_CSTRING_VALUE("original_ppid"),
+                        FLB_LOG_EVENT_UINT64_VALUE(process->original_ppid));
+        flb_log_event_encoder_append_body_values(
                         ctx->encoder,
-                        (char *)event_type_str(msg->event_type));
+                        FLB_LOG_EVENT_CSTRING_VALUE("session_id"),
+                        FLB_LOG_EVENT_UINT64_VALUE(process->session_id));
+        flb_log_event_encoder_append_body_values(
+                        ctx->encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("group_id"),
+                        FLB_LOG_EVENT_UINT64_VALUE(process->group_id));
+        flb_log_event_encoder_append_body_values(
+                        ctx->encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("is_es_client"),
+                        FLB_LOG_EVENT_BOOLEAN_VALUE(process->is_es_client));
+        flb_log_event_encoder_append_body_values(
+                        ctx->encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("is_platform_binary"),
+                        FLB_LOG_EVENT_BOOLEAN_VALUE(process->is_platform_binary));
+        flb_log_event_encoder_append_body_values(
+                        ctx->encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("signing_id"),
+                        FLB_LOG_EVENT_STRING_VALUE(process->signing_id.data, process->signing_id.length));
+        flb_log_event_encoder_body_commit_map(ctx->encoder);
         flb_log_event_encoder_commit_record(ctx->encoder);
         flb_input_log_append(ins, NULL, 0,
                                  ctx->encoder->output_buffer,
