@@ -362,6 +362,10 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                             ctx->encoder,
                             FLB_LOG_EVENT_CSTRING_VALUE("dyld_exec_path"),
                             FLB_LOG_EVENT_STRING_VALUE(msg->event.exec.dyld_exec_path.data, msg->event.exec.dyld_exec_path.length));
+                flb_log_event_encoder_append_body_cstring(
+                    ctx->encoder,
+                    "target");
+                encode_es_process_t(ctx->encoder, msg->event.exec.target);
                 flb_log_event_encoder_body_commit_map(ctx->encoder);
                 break;
             default:
