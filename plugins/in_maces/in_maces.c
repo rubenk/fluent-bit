@@ -440,11 +440,11 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
     es_event_type_t events[] = {ES_EVENT_TYPE_NOTIFY_EXEC, ES_EVENT_TYPE_NOTIFY_FORK, ES_EVENT_TYPE_NOTIFY_EXIT};
     es_return_t subscribed = es_subscribe(ctx->client, events, sizeof events / sizeof *events);
     if(subscribed != ES_RETURN_SUCCESS) {
-    flb_plg_error(ins, "Error subscribing to events");
-    flb_free(ctx);
-    return -1;
+        flb_plg_error(ins, "Error subscribing to events");
+        flb_free(ctx);
+        return -1;
     } else {
-    flb_plg_info(ins, "Subscribed to events");
+        flb_plg_info(ins, "Subscribed to events");
     }
 
     return 0;
