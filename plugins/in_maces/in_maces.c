@@ -351,10 +351,30 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                         ctx->encoder,
                         FLB_LOG_EVENT_CSTRING_VALUE("event_type"),
                         FLB_LOG_EVENT_UINT32_VALUE(msg->event_type));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("event"),
-                        FLB_LOG_EVENT_CSTRING_VALUE(event_type_str(msg->event_type)));
+        flb_log_event_encoder_append_body_cstring(
+                    ctx->encoder,
+                    "event");
+        // event specific code
+        flb_log_event_encoder_body_begin_map(ctx->encoder);
+        flb_log_event_encoder_append_body_cstring(
+                    ctx->encoder,
+                    (char *)event_type_str(msg->event_type));
+        switch (msg->event_type) {
+            case ES_EVENT_TYPE_NOTIFY_EXEC:
+                flb_log_event_encoder_body_begin_map(ctx->encoder);
+                flb_log_event_encoder_append_body_values(
+                            ctx->encoder,
+                            FLB_LOG_EVENT_CSTRING_VALUE("dyld_exec_path"),
+                            FLB_LOG_EVENT_STRING_VALUE(msg->event.exec.dyld_exec_path.data, msg->event.exec.dyld_exec_path.length));
+                flb_log_event_encoder_body_commit_map(ctx->encoder);
+                break;
+            default:
+                flb_log_event_encoder_append_body_null(ctx->encoder);
+                break;
+        }
+
+        flb_log_event_encoder_body_commit_map(ctx->encoder);
+
         encode_es_process_t(ctx->encoder, msg);
         flb_log_event_encoder_append_body_values(
                         ctx->encoder,
