@@ -243,14 +243,18 @@ static int encode_es_process_t(struct flb_log_event_encoder *encoder, const es_m
                         FLB_LOG_EVENT_CSTRING_VALUE("team_id"),
                         FLB_LOG_EVENT_NULL_VALUE());
     }
-    flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "executable");
-    encode_es_file_t(encoder, process->executable);
-    flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "tty");
-    encode_es_file_t(encoder, process->tty);
+    if (process->executable) {
+        flb_log_event_encoder_append_body_cstring(
+                        encoder,
+                        "executable");
+        encode_es_file_t(encoder, process->executable);
+    }
+    if (process->tty) {
+        flb_log_event_encoder_append_body_cstring(
+                        encoder,
+                        "tty");
+        encode_es_file_t(encoder, process->tty);
+    }
     flb_log_event_encoder_body_commit_map(encoder);
     return 0;
 }
