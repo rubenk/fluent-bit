@@ -341,6 +341,14 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
         flb_log_event_encoder_set_timestamp(ctx->encoder, &timestamp);
         flb_log_event_encoder_append_body_values(
                         ctx->encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("seq_num"),
+                        FLB_LOG_EVENT_UINT64_VALUE(msg->seq_num));
+        flb_log_event_encoder_append_body_values(
+                        ctx->encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("version"),
+                        FLB_LOG_EVENT_UINT32_VALUE(msg->version));
+        flb_log_event_encoder_append_body_values(
+                        ctx->encoder,
                         FLB_LOG_EVENT_CSTRING_VALUE("event_type"),
                         FLB_LOG_EVENT_UINT32_VALUE(msg->event_type));
         flb_log_event_encoder_append_body_values(
