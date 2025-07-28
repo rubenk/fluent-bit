@@ -127,6 +127,134 @@ const char *event_type_str(const es_event_type_t event_type) {
   return names[event_type];
 }
 
+static int encode_es_file_t(struct flb_log_event_encoder *encoder, const es_file_t *file) {
+    flb_log_event_encoder_body_begin_map(encoder);
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("path"),
+                    FLB_LOG_EVENT_STRING_VALUE(file->path.data, file->path.length));
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("path_truncated"),
+                    FLB_LOG_EVENT_BOOLEAN_VALUE(file->path_truncated));
+    flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "stat");
+    flb_log_event_encoder_body_begin_map(encoder);
+    struct stat stat = file->stat;
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("st_blocks"),
+                    FLB_LOG_EVENT_UINT64_VALUE(stat.st_blocks));
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("st_uid"),
+                    FLB_LOG_EVENT_UINT64_VALUE(stat.st_uid));
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("st_rdev"),
+                    FLB_LOG_EVENT_UINT64_VALUE(stat.st_rdev));
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("st_dev"),
+                    FLB_LOG_EVENT_UINT64_VALUE(stat.st_dev));
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("st_nlink"),
+                    FLB_LOG_EVENT_UINT64_VALUE(stat.st_nlink));
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("st_size"),
+                    FLB_LOG_EVENT_UINT64_VALUE(stat.st_size));
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("st_ino"),
+                    FLB_LOG_EVENT_UINT64_VALUE(stat.st_ino));
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("st_gid"),
+                    FLB_LOG_EVENT_UINT64_VALUE(stat.st_gid));
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("st_mode"),
+                    FLB_LOG_EVENT_UINT64_VALUE(stat.st_mode));
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("st_blksize"),
+                    FLB_LOG_EVENT_UINT64_VALUE(stat.st_blksize));
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("st_flags"),
+                    FLB_LOG_EVENT_UINT32_VALUE(stat.st_flags));
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("st_gen"),
+                    FLB_LOG_EVENT_UINT32_VALUE(stat.st_gen));
+    flb_log_event_encoder_body_commit_map(encoder);
+    flb_log_event_encoder_body_commit_map(encoder);
+}
+
+static int encode_es_process_t(struct flb_log_event_encoder *encoder, const es_message_t *msg) {
+    flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "process");
+    flb_log_event_encoder_body_begin_map(encoder);
+    es_process_t *process = msg->process;
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("ppid"),
+                    FLB_LOG_EVENT_UINT64_VALUE(process->ppid));
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("original_ppid"),
+                    FLB_LOG_EVENT_UINT64_VALUE(process->original_ppid));
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("group_id"),
+                    FLB_LOG_EVENT_UINT64_VALUE(process->group_id));
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("session_id"),
+                    FLB_LOG_EVENT_UINT64_VALUE(process->session_id));
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("codesigning_flags"),
+                    FLB_LOG_EVENT_UINT32_VALUE(process->codesigning_flags));
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("is_platform_binary"),
+                    FLB_LOG_EVENT_BOOLEAN_VALUE(process->is_platform_binary));
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("is_es_client"),
+                    FLB_LOG_EVENT_BOOLEAN_VALUE(process->is_es_client));
+    flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("signing_id"),
+                    FLB_LOG_EVENT_STRING_VALUE(process->signing_id.data, process->signing_id.length));
+    if (process->team_id.length > 0) {
+        flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("team_id"),
+                        FLB_LOG_EVENT_STRING_VALUE(process->team_id.data, process->team_id.length));
+    } else {
+        flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("team_id"),
+                        FLB_LOG_EVENT_NULL_VALUE());
+    }
+    flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "executable");
+    encode_es_file_t(encoder, process->executable);
+    flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "tty");
+    encode_es_file_t(encoder, process->tty);
+    flb_log_event_encoder_body_commit_map(encoder);
+    return 0;
+}
+
 static int in_maces_init(struct flb_input_instance *ins, struct flb_config *config, void *data) {
     struct flb_maces_config *ctx = flb_calloc(1, sizeof(struct flb_maces_config));
     if (!ctx) {
@@ -160,123 +288,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                         ctx->encoder,
                         FLB_LOG_EVENT_CSTRING_VALUE("event"),
                         FLB_LOG_EVENT_CSTRING_VALUE(event_type_str(msg->event_type)));
-        flb_log_event_encoder_append_body_cstring(
-                        ctx->encoder,
-                        "process");
-        flb_log_event_encoder_body_begin_map(ctx->encoder);
-        es_process_t *process = msg->process;
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("ppid"),
-                        FLB_LOG_EVENT_UINT64_VALUE(process->ppid));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("original_ppid"),
-                        FLB_LOG_EVENT_UINT64_VALUE(process->original_ppid));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("group_id"),
-                        FLB_LOG_EVENT_UINT64_VALUE(process->group_id));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("session_id"),
-                        FLB_LOG_EVENT_UINT64_VALUE(process->session_id));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("codesigning_flags"),
-                        FLB_LOG_EVENT_UINT32_VALUE(process->codesigning_flags));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("is_platform_binary"),
-                        FLB_LOG_EVENT_BOOLEAN_VALUE(process->is_platform_binary));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("is_es_client"),
-                        FLB_LOG_EVENT_BOOLEAN_VALUE(process->is_es_client));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("signing_id"),
-                        FLB_LOG_EVENT_STRING_VALUE(process->signing_id.data, process->signing_id.length));
-        if (process->team_id.length > 0) {
-            flb_log_event_encoder_append_body_values(
-                            ctx->encoder,
-                            FLB_LOG_EVENT_CSTRING_VALUE("team_id"),
-                            FLB_LOG_EVENT_STRING_VALUE(process->team_id.data, process->team_id.length));
-        } else {
-            flb_log_event_encoder_append_body_values(
-                            ctx->encoder,
-                            FLB_LOG_EVENT_CSTRING_VALUE("team_id"),
-                            FLB_LOG_EVENT_NULL_VALUE());
-        }
-        flb_log_event_encoder_append_body_cstring(
-                        ctx->encoder,
-                        "executable");
-        flb_log_event_encoder_body_begin_map(ctx->encoder);
-        es_file_t *executable = process->executable;
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("path"),
-                        FLB_LOG_EVENT_STRING_VALUE(executable->path.data, executable->path.length));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("path_truncated"),
-                        FLB_LOG_EVENT_BOOLEAN_VALUE(executable->path_truncated));
-        flb_log_event_encoder_append_body_cstring(
-                        ctx->encoder,
-                        "stat");
-        flb_log_event_encoder_body_begin_map(ctx->encoder);
-        struct stat stat = executable->stat;
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("st_blocks"),
-                        FLB_LOG_EVENT_UINT64_VALUE(stat.st_blocks));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("st_uid"),
-                        FLB_LOG_EVENT_UINT64_VALUE(stat.st_uid));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("st_rdev"),
-                        FLB_LOG_EVENT_UINT64_VALUE(stat.st_rdev));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("st_dev"),
-                        FLB_LOG_EVENT_UINT64_VALUE(stat.st_dev));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("st_nlink"),
-                        FLB_LOG_EVENT_UINT64_VALUE(stat.st_nlink));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("st_size"),
-                        FLB_LOG_EVENT_UINT64_VALUE(stat.st_size));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("st_ino"),
-                        FLB_LOG_EVENT_UINT64_VALUE(stat.st_ino));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("st_gid"),
-                        FLB_LOG_EVENT_UINT64_VALUE(stat.st_gid));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("st_mode"),
-                        FLB_LOG_EVENT_UINT64_VALUE(stat.st_mode));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("st_blksize"),
-                        FLB_LOG_EVENT_UINT64_VALUE(stat.st_blksize));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("st_flags"),
-                        FLB_LOG_EVENT_UINT32_VALUE(stat.st_flags));
-        flb_log_event_encoder_append_body_values(
-                        ctx->encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("st_gen"),
-                        FLB_LOG_EVENT_UINT32_VALUE(stat.st_gen));
-        flb_log_event_encoder_body_commit_map(ctx->encoder);
-        flb_log_event_encoder_body_commit_map(ctx->encoder);
-        flb_log_event_encoder_body_commit_map(ctx->encoder);
+        encode_es_process_t(ctx->encoder, msg);
         flb_log_event_encoder_commit_record(ctx->encoder);
         flb_input_log_append(ins, NULL, 0,
                                  ctx->encoder->output_buffer,
