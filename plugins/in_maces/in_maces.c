@@ -356,6 +356,19 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                         FLB_LOG_EVENT_CSTRING_VALUE("event"),
                         FLB_LOG_EVENT_CSTRING_VALUE(event_type_str(msg->event_type)));
         encode_es_process_t(ctx->encoder, msg);
+        flb_log_event_encoder_append_body_values(
+                        ctx->encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("global_seq_num"),
+                        FLB_LOG_EVENT_UINT64_VALUE(msg->global_seq_num));
+        flb_log_event_encoder_append_body_cstring(
+                    ctx->encoder,
+                    "thread");
+        flb_log_event_encoder_body_begin_map(ctx->encoder);
+        flb_log_event_encoder_append_body_values(
+                        ctx->encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("thread_id"),
+                        FLB_LOG_EVENT_UINT64_VALUE(msg->thread->thread_id));
+        flb_log_event_encoder_body_commit_map(ctx->encoder);
         flb_log_event_encoder_commit_record(ctx->encoder);
         flb_input_log_append(ins, NULL, 0,
                                  ctx->encoder->output_buffer,
