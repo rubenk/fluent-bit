@@ -376,6 +376,14 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 encode_es_process_t(ctx->encoder, msg->event.fork.child);
                 flb_log_event_encoder_body_commit_map(ctx->encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_EXIT:
+                flb_log_event_encoder_body_begin_map(ctx->encoder);
+                flb_log_event_encoder_append_body_values(
+                            ctx->encoder,
+                            FLB_LOG_EVENT_CSTRING_VALUE("stat"),
+                            FLB_LOG_EVENT_UINT64_VALUE(msg->event.exit.stat));
+                flb_log_event_encoder_body_commit_map(ctx->encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(ctx->encoder);
                 break;
