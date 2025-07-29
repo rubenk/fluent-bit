@@ -287,6 +287,34 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                             FLB_LOG_EVENT_UINT64_VALUE(msg->event.exit.stat));
                 flb_log_event_encoder_body_commit_map(ctx->encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_OPEN:
+                flb_log_event_encoder_body_begin_map(ctx->encoder);
+                flb_log_event_encoder_append_body_values(
+                            ctx->encoder,
+                            FLB_LOG_EVENT_CSTRING_VALUE("fflag"),
+                   FLB_LOG_EVENT_UINT32_VALUE(msg->event.open.fflag));
+                flb_log_event_encoder_append_body_cstring(
+                    ctx->encoder,
+                    "file");
+                encode_es_file_t(ctx->encoder, msg->event.open.file);
+                flb_log_event_encoder_body_commit_map(ctx->encoder);
+                break;
+            case ES_EVENT_TYPE_NOTIFY_CLOSE:
+                flb_log_event_encoder_body_begin_map(ctx->encoder);
+                flb_log_event_encoder_append_body_values(
+                    ctx->encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("modified"),
+                    FLB_LOG_EVENT_BOOLEAN_VALUE(msg->event.close.modified));
+                flb_log_event_encoder_append_body_values(
+                    ctx->encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("was_mapped_writable"),
+                    FLB_LOG_EVENT_BOOLEAN_VALUE(msg->event.close.was_mapped_writable));
+                flb_log_event_encoder_append_body_cstring(
+                    ctx->encoder,
+                    "target");
+                encode_es_file_t(ctx->encoder, msg->event.close.target);
+                flb_log_event_encoder_body_commit_map(ctx->encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(ctx->encoder);
                 break;
