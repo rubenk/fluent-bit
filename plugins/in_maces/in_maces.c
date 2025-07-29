@@ -22,6 +22,8 @@
 
 #include <EndpointSecurity/EndpointSecurity.h>
 #include <bsm/libbsm.h>
+#include <sys/types.h>
+#include <sys/acl.h>
 
 #include "events.h"
 
@@ -313,6 +315,62 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     ctx->encoder,
                     "target");
                 encode_es_file_t(ctx->encoder, msg->event.close.target);
+                flb_log_event_encoder_body_commit_map(ctx->encoder);
+                break;
+            case ES_EVENT_TYPE_NOTIFY_CREATE:
+                flb_log_event_encoder_body_begin_map(ctx->encoder);
+                flb_log_event_encoder_append_body_values(
+                    ctx->encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("destination_type"),
+                    FLB_LOG_EVENT_INT32_VALUE(msg->event.create.destination_type));
+                if (msg->version >= 2 && msg->event.create.acl) {
+                    // as the comment in ESMessage.h says, the acl in the message
+                    // is not a complete type. We need to convert it to an external representation first,
+                    // and back again
+
+                    // TODO: this needs error handling and proper sizing of the buffer
+                    char buf[1024];
+                    acl_copy_ext(buf, msg->event.create.acl, 1024);
+                    acl_t acl = acl_copy_int(buf);
+                    char *acl_txt = acl_to_text(acl, NULL);
+                    if (acl_txt == NULL) {
+                        flb_errno();
+                    } else {
+                        flb_log_event_encoder_append_body_values(
+                            ctx->encoder,
+                            FLB_LOG_EVENT_CSTRING_VALUE("acl"),
+                            FLB_LOG_EVENT_CSTRING_VALUE(acl_txt));
+                        acl_free(acl);
+                        acl_free(acl_txt);
+                    }
+                } else {
+                    flb_log_event_encoder_append_body_values(
+                        ctx->encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("acl"),
+                        FLB_LOG_EVENT_NULL_VALUE());
+                }
+                flb_log_event_encoder_append_body_cstring(
+                    ctx->encoder,
+                    "destination");
+                if (msg->event.create.destination_type == ES_DESTINATION_TYPE_EXISTING_FILE) {
+                    flb_log_event_encoder_body_begin_map(ctx->encoder);
+                    flb_log_event_encoder_append_body_cstring(
+                        ctx->encoder,
+                        "existing_file");
+                    encode_es_file_t(ctx->encoder, msg->event.open.file);
+                    flb_log_event_encoder_body_commit_map(ctx->encoder);
+                } else if (msg->event.create.destination_type == ES_DESTINATION_TYPE_NEW_PATH) {
+                    flb_log_event_encoder_body_begin_map(ctx->encoder);
+                    flb_log_event_encoder_append_body_values(
+                        ctx->encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("filename"),
+                        FLB_LOG_EVENT_STRING_VALUE(msg->event.create.destination.new_path.filename.data, msg->event.create.destination.new_path.filename.length));
+                    flb_log_event_encoder_append_body_cstring(
+                        ctx->encoder,
+                        "dir");
+                    encode_es_file_t(ctx->encoder, msg->event.create.destination.new_path.dir);
+                    flb_log_event_encoder_body_commit_map(ctx->encoder);
+                }
                 flb_log_event_encoder_body_commit_map(ctx->encoder);
                 break;
             default:
