@@ -236,6 +236,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
     // This block is called by Endpoint Security for each event
     es_handler_block_t handler = ^(es_client_t *c, const es_message_t *msg ) {
         flb_log_event_encoder_begin_record(ctx->encoder);
+        es_events_t event = msg->event;
         struct flb_time timestamp = {
             .tm = msg->time
         };
@@ -266,11 +267,11 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 flb_log_event_encoder_append_body_values(
                             ctx->encoder,
                             FLB_LOG_EVENT_CSTRING_VALUE("dyld_exec_path"),
-                            FLB_LOG_EVENT_STRING_VALUE(msg->event.exec.dyld_exec_path.data, msg->event.exec.dyld_exec_path.length));
+                            FLB_LOG_EVENT_STRING_VALUE(event.exec.dyld_exec_path.data, event.exec.dyld_exec_path.length));
                 flb_log_event_encoder_append_body_cstring(
                     ctx->encoder,
                     "target");
-                encode_es_process_t(ctx->encoder, msg->event.exec.target);
+                encode_es_process_t(ctx->encoder, event.exec.target);
                 flb_log_event_encoder_body_commit_map(ctx->encoder);
                 break;
             case ES_EVENT_TYPE_NOTIFY_FORK:
@@ -278,7 +279,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 flb_log_event_encoder_append_body_cstring(
                             ctx->encoder,
                             "child");
-                encode_es_process_t(ctx->encoder, msg->event.fork.child);
+                encode_es_process_t(ctx->encoder, event.fork.child);
                 flb_log_event_encoder_body_commit_map(ctx->encoder);
                 break;
             case ES_EVENT_TYPE_NOTIFY_EXIT:
@@ -286,7 +287,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 flb_log_event_encoder_append_body_values(
                             ctx->encoder,
                             FLB_LOG_EVENT_CSTRING_VALUE("stat"),
-                            FLB_LOG_EVENT_UINT64_VALUE(msg->event.exit.stat));
+                            FLB_LOG_EVENT_UINT64_VALUE(event.exit.stat));
                 flb_log_event_encoder_body_commit_map(ctx->encoder);
                 break;
             case ES_EVENT_TYPE_NOTIFY_OPEN:
@@ -294,11 +295,11 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 flb_log_event_encoder_append_body_values(
                             ctx->encoder,
                             FLB_LOG_EVENT_CSTRING_VALUE("fflag"),
-                   FLB_LOG_EVENT_UINT32_VALUE(msg->event.open.fflag));
+                   FLB_LOG_EVENT_UINT32_VALUE(event.open.fflag));
                 flb_log_event_encoder_append_body_cstring(
                     ctx->encoder,
                     "file");
-                encode_es_file_t(ctx->encoder, msg->event.open.file);
+                encode_es_file_t(ctx->encoder, event.open.file);
                 flb_log_event_encoder_body_commit_map(ctx->encoder);
                 break;
             case ES_EVENT_TYPE_NOTIFY_CLOSE:
@@ -306,15 +307,15 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 flb_log_event_encoder_append_body_values(
                     ctx->encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("modified"),
-                    FLB_LOG_EVENT_BOOLEAN_VALUE(msg->event.close.modified));
+                    FLB_LOG_EVENT_BOOLEAN_VALUE(event.close.modified));
                 flb_log_event_encoder_append_body_values(
                     ctx->encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("was_mapped_writable"),
-                    FLB_LOG_EVENT_BOOLEAN_VALUE(msg->event.close.was_mapped_writable));
+                    FLB_LOG_EVENT_BOOLEAN_VALUE(event.close.was_mapped_writable));
                 flb_log_event_encoder_append_body_cstring(
                     ctx->encoder,
                     "target");
-                encode_es_file_t(ctx->encoder, msg->event.close.target);
+                encode_es_file_t(ctx->encoder, event.close.target);
                 flb_log_event_encoder_body_commit_map(ctx->encoder);
                 break;
             case ES_EVENT_TYPE_NOTIFY_CREATE:
@@ -322,15 +323,15 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 flb_log_event_encoder_append_body_values(
                     ctx->encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("destination_type"),
-                    FLB_LOG_EVENT_INT32_VALUE(msg->event.create.destination_type));
-                if (msg->version >= 2 && msg->event.create.acl) {
+                    FLB_LOG_EVENT_INT32_VALUE(event.create.destination_type));
+                if (msg->version >= 2 && event.create.acl) {
                     // as the comment in ESMessage.h says, the acl in the message
                     // is not a complete type. We need to convert it to an external representation first,
                     // and back again
 
                     // TODO: this needs error handling and proper sizing of the buffer
                     char buf[1024];
-                    acl_copy_ext(buf, msg->event.create.acl, 1024);
+                    acl_copy_ext(buf, event.create.acl, 1024);
                     acl_t acl = acl_copy_int(buf);
                     char *acl_txt = acl_to_text(acl, NULL);
                     if (acl_txt == NULL) {
@@ -352,23 +353,23 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 flb_log_event_encoder_append_body_cstring(
                     ctx->encoder,
                     "destination");
-                if (msg->event.create.destination_type == ES_DESTINATION_TYPE_EXISTING_FILE) {
+                if (event.create.destination_type == ES_DESTINATION_TYPE_EXISTING_FILE) {
                     flb_log_event_encoder_body_begin_map(ctx->encoder);
                     flb_log_event_encoder_append_body_cstring(
                         ctx->encoder,
                         "existing_file");
-                    encode_es_file_t(ctx->encoder, msg->event.open.file);
+                    encode_es_file_t(ctx->encoder, event.open.file);
                     flb_log_event_encoder_body_commit_map(ctx->encoder);
-                } else if (msg->event.create.destination_type == ES_DESTINATION_TYPE_NEW_PATH) {
+                } else if (event.create.destination_type == ES_DESTINATION_TYPE_NEW_PATH) {
                     flb_log_event_encoder_body_begin_map(ctx->encoder);
                     flb_log_event_encoder_append_body_values(
                         ctx->encoder,
                         FLB_LOG_EVENT_CSTRING_VALUE("filename"),
-                        FLB_LOG_EVENT_STRING_VALUE(msg->event.create.destination.new_path.filename.data, msg->event.create.destination.new_path.filename.length));
+                        FLB_LOG_EVENT_STRING_VALUE(event.create.destination.new_path.filename.data, event.create.destination.new_path.filename.length));
                     flb_log_event_encoder_append_body_cstring(
                         ctx->encoder,
                         "dir");
-                    encode_es_file_t(ctx->encoder, msg->event.create.destination.new_path.dir);
+                    encode_es_file_t(ctx->encoder, event.create.destination.new_path.dir);
                     flb_log_event_encoder_body_commit_map(ctx->encoder);
                 }
                 flb_log_event_encoder_body_commit_map(ctx->encoder);
