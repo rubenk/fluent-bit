@@ -383,6 +383,10 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     FLB_LOG_EVENT_INT32_VALUE(event.mmap.protection));
                 flb_log_event_encoder_append_body_values(
                     ctx->encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("flags"),
+                    FLB_LOG_EVENT_INT32_VALUE(event.mmap.flags));
+                flb_log_event_encoder_append_body_values(
+                    ctx->encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("file_pos"),
                     FLB_LOG_EVENT_UINT64_VALUE(event.mmap.file_pos));
                 flb_log_event_encoder_append_body_cstring(
