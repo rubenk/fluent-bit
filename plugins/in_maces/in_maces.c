@@ -411,6 +411,22 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     FLB_LOG_EVENT_UINT64_VALUE(event.mprotect.size));
                 flb_log_event_encoder_body_commit_map(ctx->encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_UIPC_BIND:
+                flb_log_event_encoder_body_begin_map(ctx->encoder);
+                flb_log_event_encoder_append_body_cstring(
+                    ctx->encoder,
+                    "dir");
+                encode_es_file_t(ctx->encoder, event.uipc_bind.dir);
+                flb_log_event_encoder_append_body_values(
+                    ctx->encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("filename"),
+                    FLB_LOG_EVENT_STRING_VALUE(event.uipc_bind.filename.data, event.uipc_bind.filename.length));
+                flb_log_event_encoder_append_body_values(
+                    ctx->encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("mode"),
+                    FLB_LOG_EVENT_UINT32_VALUE(event.uipc_bind.mode));
+                flb_log_event_encoder_body_commit_map(ctx->encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(ctx->encoder);
                 break;
