@@ -237,10 +237,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
     es_handler_block_t handler = ^(es_client_t *c, const es_message_t *msg ) {
         flb_log_event_encoder_begin_record(ctx->encoder);
         es_events_t event = msg->event;
-        struct flb_time timestamp = {
-            .tm = msg->time
-        };
-        flb_log_event_encoder_set_timestamp(ctx->encoder, &timestamp);
+        flb_log_event_encoder_set_timestamp(ctx->encoder, &((struct flb_time) { .tm = msg->time}));
         flb_log_event_encoder_append_body_values(
                         ctx->encoder,
                         FLB_LOG_EVENT_CSTRING_VALUE("seq_num"),
