@@ -360,7 +360,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     flb_log_event_encoder_append_body_cstring(
                         encoder,
                         "existing_file");
-                    encode_es_file_t(encoder, event.open.file);
+                    encode_es_file_t(encoder, event.create.destination.existing_file);
                     flb_log_event_encoder_body_commit_map(encoder);
                 } else if (event.create.destination_type == ES_DESTINATION_TYPE_NEW_PATH) {
                     flb_log_event_encoder_body_begin_map(encoder);
