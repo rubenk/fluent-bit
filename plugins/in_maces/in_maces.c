@@ -452,6 +452,18 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     FLB_LOG_EVENT_INT32_VALUE(event.uipc_connect.protocol));
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_ACCESS:
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("mode"),
+                    FLB_LOG_EVENT_INT32_VALUE(event.access.mode));
+                flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "target");
+                encode_es_file_t(encoder, event.access.target);
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
