@@ -515,7 +515,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
 
 /* Plugin registration */
 struct flb_input_plugin in_maces_plugin = {
-    .name         = "maces",
-    .description  = "MacOS Endpoint Security input plugin",
-    .cb_init      = in_maces_init,
+    .name        = "maces",
+    .description = "MacOS Endpoint Security input plugin",
+    .cb_init     = in_maces_init,
 };
