@@ -532,6 +532,24 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     FLB_LOG_EVENT_STRING_VALUE(event.link.target_filename.data, event.link.target_filename.length));
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_SIGNAL:
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("sig"),
+                    FLB_LOG_EVENT_INT32_VALUE(event.signal.sig));
+                flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "target");
+                encode_es_process_t(encoder, event.signal.target);
+                if (event.signal.instigator) {
+                  flb_log_event_encoder_append_body_cstring(
+                      encoder,
+                      "instigator");
+                  encode_es_process_t(encoder, event.signal.instigator);
+                }
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
