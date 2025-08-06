@@ -550,6 +550,18 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_SETEXTATTR:
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "target");
+                encode_es_file_t(encoder, event.setextattr.target);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("extattr"),
+                    FLB_LOG_EVENT_STRING_VALUE(event.setextattr.extattr.data, event.setextattr.extattr.length));
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
