@@ -649,6 +649,18 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 encode_es_file_t(encoder, event.chroot.target);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_IOKIT_OPEN:
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("user_client_type"),
+                    FLB_LOG_EVENT_UINT32_VALUE(event.iokit_open.user_client_type));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("user_client_class"),
+                    FLB_LOG_EVENT_STRING_VALUE(event.iokit_open.user_client_class.data, event.iokit_open.user_client_class.length));
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
