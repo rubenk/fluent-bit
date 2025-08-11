@@ -33,6 +33,16 @@ struct flb_maces_config {
     struct flb_log_event_encoder *encoder;
 };
 
+
+static int encode_timespec(struct flb_log_event_encoder *encoder, const struct timespec *ts) {
+    char buf[31];
+    struct tm tm;
+    gmtime_r(&ts->tv_sec, &tm);
+    strftime(buf, 21, "%Y-%m-%dT%H:%M:%S.", &tm);
+    snprintf(buf + 20, 11, "%09luZ", ts->tv_nsec);
+    buf[30] = '\0';
+    return flb_log_event_encoder_append_body_cstring(encoder, buf);
+}
 static int encode_attrlist(struct flb_log_event_encoder *encoder, const struct attrlist *attrlist) {
     flb_log_event_encoder_body_begin_map(encoder);
     flb_log_event_encoder_append_body_values(
@@ -242,6 +252,14 @@ static int encode_es_file_t(struct flb_log_event_encoder *encoder, const es_file
         encoder,
         FLB_LOG_EVENT_CSTRING_VALUE("st_gen"),
         FLB_LOG_EVENT_UINT32_VALUE(stat.st_gen));
+    flb_log_event_encoder_append_body_cstring(encoder, "st_atimespec");
+    encode_timespec(encoder, &stat.st_atimespec);
+    flb_log_event_encoder_append_body_cstring(encoder, "st_mtimespec");
+    encode_timespec(encoder, &stat.st_mtimespec);
+    flb_log_event_encoder_append_body_cstring(encoder, "st_ctimespec");
+    encode_timespec(encoder, &stat.st_ctimespec);
+    flb_log_event_encoder_append_body_cstring(encoder, "st_birthtimespec");
+    encode_timespec(encoder, &stat.st_birthtimespec);
     flb_log_event_encoder_body_commit_map(encoder);
     flb_log_event_encoder_body_commit_map(encoder);
     return 0;
