@@ -881,7 +881,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     encoder,
                     "target");
                 encode_es_file_t(encoder, event.file_provider_materialize.target);
-                // TODO: encode instigator_token
+                encode_audit_token_t(encoder, &event.file_provider_materialize.instigator_token);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             case ES_EVENT_TYPE_NOTIFY_DUP:
