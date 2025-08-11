@@ -781,6 +781,22 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 encode_es_file_t(encoder, event.setmode.target);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_SETOWNER:
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("uid"),
+                    FLB_LOG_EVENT_UINT32_VALUE(event.setowner.uid));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("gid"),
+                    FLB_LOG_EVENT_UINT32_VALUE(event.setowner.gid));
+                flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "target");
+                encode_es_file_t(encoder, event.setowner.target);
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
