@@ -818,10 +818,10 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     "target");
                 encode_es_process_t(encoder, event.get_task_read.target);
                 if (msg->version >= 5) {
-                  flb_log_event_encoder_append_body_values(
-                      encoder,
-                      FLB_LOG_EVENT_CSTRING_VALUE("type"),
-                      FLB_LOG_EVENT_INT32_VALUE(event.get_task_read.type));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("type"),
+                        FLB_LOG_EVENT_INT32_VALUE(event.get_task_read.type));
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
@@ -832,10 +832,10 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     "target");
                 encode_es_process_t(encoder, event.get_task_inspect.target);
                 if (msg->version >= 5) {
-                  flb_log_event_encoder_append_body_values(
-                      encoder,
-                      FLB_LOG_EVENT_CSTRING_VALUE("type"),
-                      FLB_LOG_EVENT_INT32_VALUE(event.get_task_inspect.type));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("type"),
+                        FLB_LOG_EVENT_INT32_VALUE(event.get_task_inspect.type));
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
