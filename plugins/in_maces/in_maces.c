@@ -846,11 +846,42 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     "target");
                 encode_es_process_t(encoder, event.get_task_name.target);
                 if (msg->version >= 5) {
-                  flb_log_event_encoder_append_body_values(
-                      encoder,
-                      FLB_LOG_EVENT_CSTRING_VALUE("type"),
-                      FLB_LOG_EVENT_INT32_VALUE(event.get_task_name.type));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("type"),
+                        FLB_LOG_EVENT_INT32_VALUE(event.get_task_name.type));
                 }
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
+            case ES_EVENT_TYPE_NOTIFY_FILE_PROVIDER_UPDATE:
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "source");
+                encode_es_file_t(encoder, event.file_provider_update.source);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("target_path"),
+                    FLB_LOG_EVENT_STRING_VALUE(event.file_provider_update.target_path.data, event.file_provider_update.target_path.length));
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
+            case ES_EVENT_TYPE_NOTIFY_FILE_PROVIDER_MATERIALIZE:
+                flb_log_event_encoder_body_begin_map(encoder);
+                if (event->instigator) {
+                    flb_log_event_encoder_append_body_cstring(
+                        encoder,
+                        "instigator");
+                    encode_es_process_t(encoder, event.file_provider_materialize.instigator);
+                }
+                flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "source");
+                encode_es_file_t(encoder, event.file_provider_materialize.source);
+                flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "target");
+                encode_es_file_t(encoder, event.file_provider_materialize.target);
+                // TODO: encode instigator_token
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             default:
