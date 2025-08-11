@@ -697,6 +697,34 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     FLB_LOG_EVENT_STRING_VALUE(event.clone.target_name.data, event.clone.target_name.length));
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_COPYFILE:
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "source");
+                encode_es_file_t(encoder, event.copyfile.source);
+                flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "target_file");
+                encode_es_file_t(encoder, event.copyfile.target_file);
+                flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "target_dir");
+                encode_es_file_t(encoder, event.copyfile.target_dir);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("target_name"),
+                    FLB_LOG_EVENT_STRING_VALUE(event.copyfile.target_name.data, event.copyfile.target_name.length));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("mode"),
+                    FLB_LOG_EVENT_INT32_VALUE(event.copyfile.mode));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("flags"),
+                    FLB_LOG_EVENT_INT32_VALUE(event.copyfile.flags));
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
