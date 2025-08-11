@@ -867,7 +867,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 break;
             case ES_EVENT_TYPE_NOTIFY_FILE_PROVIDER_MATERIALIZE:
                 flb_log_event_encoder_body_begin_map(encoder);
-                if (event->instigator) {
+                if (event.file_provider_materialize.instigator) {
                     flb_log_event_encoder_append_body_cstring(
                         encoder,
                         "instigator");
