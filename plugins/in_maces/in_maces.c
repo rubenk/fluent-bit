@@ -1009,6 +1009,43 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_GETATTRLIST:
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "attrlist");
+                flb_log_event_encoder_body_begin_map(encoder);
+                  flb_log_event_encoder_append_body_values(
+                      encoder,
+                      FLB_LOG_EVENT_CSTRING_VALUE("bitmapcount"),
+                      FLB_LOG_EVENT_UINT32_VALUE(event.getattrlist.attrlist.bitmapcount));
+                  flb_log_event_encoder_append_body_values(
+                      encoder,
+                      FLB_LOG_EVENT_CSTRING_VALUE("forkattr"),
+                      FLB_LOG_EVENT_UINT32_VALUE(event.getattrlist.attrlist.forkattr));
+                  flb_log_event_encoder_append_body_values(
+                      encoder,
+                      FLB_LOG_EVENT_CSTRING_VALUE("fileattr"),
+                      FLB_LOG_EVENT_UINT32_VALUE(event.getattrlist.attrlist.fileattr));
+                  flb_log_event_encoder_append_body_values(
+                      encoder,
+                      FLB_LOG_EVENT_CSTRING_VALUE("dirattr"),
+                      FLB_LOG_EVENT_UINT32_VALUE(event.getattrlist.attrlist.dirattr));
+                  flb_log_event_encoder_append_body_values(
+                      encoder,
+                      FLB_LOG_EVENT_CSTRING_VALUE("volattr"),
+                      FLB_LOG_EVENT_UINT32_VALUE(event.getattrlist.attrlist.volattr));
+                  flb_log_event_encoder_append_body_values(
+                      encoder,
+                      FLB_LOG_EVENT_CSTRING_VALUE("commonattr"),
+                      FLB_LOG_EVENT_UINT32_VALUE(event.getattrlist.attrlist.commonattr));
+                flb_log_event_encoder_body_commit_map(encoder);
+                flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "target");
+                encode_es_file_t(encoder, event.getattrlist.target);
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
