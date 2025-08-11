@@ -989,6 +989,24 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 encode_statfs(encoder, event.unmount.statfs);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_REMOUNT:
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "statfs");
+                encode_statfs(encoder, event.remount.statfs);
+                if (msg->version >= 8) {
+                  flb_log_event_encoder_append_body_values(
+                      encoder,
+                      FLB_LOG_EVENT_CSTRING_VALUE("remount_flags"),
+                      FLB_LOG_EVENT_UINT64_VALUE(event.remount.remount_flags));
+                  flb_log_event_encoder_append_body_values(
+                      encoder,
+                      FLB_LOG_EVENT_CSTRING_VALUE("disposition"),
+                      FLB_LOG_EVENT_INT32_VALUE(event.remount.disposition));
+                }
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
