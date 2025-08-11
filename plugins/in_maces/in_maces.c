@@ -33,6 +33,83 @@ struct flb_maces_config {
     struct flb_log_event_encoder *encoder;
 };
 
+static int encode_statfs(struct flb_log_event_encoder *encoder, struct statfs *statfs) {
+    flb_log_event_encoder_body_begin_map(encoder);
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("f_bsize"),
+        FLB_LOG_EVENT_UINT32_VALUE(statfs->f_bsize));
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("f_iosize"),
+        FLB_LOG_EVENT_INT32_VALUE(statfs->f_iosize));
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("f_blocks"),
+        FLB_LOG_EVENT_UINT64_VALUE(statfs->f_blocks));
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("f_bfree"),
+        FLB_LOG_EVENT_UINT64_VALUE(statfs->f_bfree));
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("f_bavail"),
+        FLB_LOG_EVENT_UINT64_VALUE(statfs->f_bavail));
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("f_files"),
+        FLB_LOG_EVENT_UINT64_VALUE(statfs->f_files));
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("f_ffree"),
+        FLB_LOG_EVENT_UINT64_VALUE(statfs->f_ffree));
+    flb_log_event_encoder_append_body_cstring(
+        encoder,
+        "f_fsid"),
+    flb_log_event_encoder_body_begin_array(encoder);
+    flb_log_event_encoder_append_body_int32(
+        encoder,
+        statfs->f_fsid.val[0]);
+    flb_log_event_encoder_append_body_int32(
+        encoder,
+        statfs->f_fsid.val[1]);
+    flb_log_event_encoder_body_commit_array(encoder);
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("f_owner"),
+        FLB_LOG_EVENT_UINT32_VALUE(statfs->f_owner));
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("f_type"),
+        FLB_LOG_EVENT_UINT32_VALUE(statfs->f_type));
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("f_flags"),
+        FLB_LOG_EVENT_UINT32_VALUE(statfs->f_flags));
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("f_fssubtype"),
+        FLB_LOG_EVENT_UINT32_VALUE(statfs->f_fssubtype));
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("f_fstypename"),
+        FLB_LOG_EVENT_CSTRING_VALUE(statfs->f_fstypename));
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("f_mntonname"),
+        FLB_LOG_EVENT_CSTRING_VALUE(statfs->f_mntonname));
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("f_mntfromname"),
+        FLB_LOG_EVENT_CSTRING_VALUE(statfs->f_mntfromname));
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("f_flags_ext"),
+        FLB_LOG_EVENT_UINT32_VALUE(statfs->f_flags_ext));
+    flb_log_event_encoder_body_commit_map(encoder);
+    return 0;
+}
+
 static int encode_audit_token_t(struct flb_log_event_encoder *encoder, const audit_token_t *token) {
     flb_log_event_encoder_body_begin_map(encoder);
     flb_log_event_encoder_append_body_values(
@@ -890,6 +967,18 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     encoder,
                     "target");
                 encode_es_file_t(encoder, event.dup.target);
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
+            case ES_EVENT_TYPE_NOTIFY_MOUNT:
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("disposition"),
+                    FLB_LOG_EVENT_INT32_VALUE(event.mount.disposition));
+                flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "statfs");
+                encode_statfs(encoder, event.mount.statfs);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             default:
