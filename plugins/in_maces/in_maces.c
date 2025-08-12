@@ -1333,6 +1333,40 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     FLB_LOG_EVENT_INT32_VALUE(event.xpc_connect->service_domain_type));
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_ADD:
+                flb_log_event_encoder_body_begin_map(encoder);
+                if (event.btm_launch_item_add->instigator) {
+                    flb_log_event_encoder_append_body_cstring(
+                        encoder,
+                        "instigator");
+                    encode_es_process_t(encoder, event.btm_launch_item_add->instigator);
+                }
+                if (event.btm_launch_item_add->app) {
+                    flb_log_event_encoder_append_body_cstring(
+                        encoder,
+                        "app");
+                    encode_es_process_t(encoder, event.btm_launch_item_add->app);
+                }
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("executable_path"),
+                    FLB_LOG_EVENT_STRING_VALUE(event.btm_launch_item_add->executable_path.data, event.btm_launch_item_add->executable_path.length));
+                if (msg->version >= 8) {
+                    if (event.btm_launch_item_add->instigator_token) {
+                        flb_log_event_encoder_append_body_cstring(
+                            encoder,
+                            "instigator_token");
+                        encode_audit_token_t(encoder, event.btm_launch_item_add->instigator_token);
+                    }
+                    if (event.btm_launch_item_add->app_token) {
+                        flb_log_event_encoder_append_body_cstring(
+                            encoder,
+                            "app_token");
+                        encode_audit_token_t(encoder, event.btm_launch_item_add->app_token);
+                    }
+                }
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
