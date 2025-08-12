@@ -1309,6 +1309,18 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_LOGIN_LOGOUT:
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("username"),
+                    FLB_LOG_EVENT_STRING_VALUE(event.login_logout->username.data, event.login_logout->username.length));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("uid"),
+                    FLB_LOG_EVENT_UINT32_VALUE(event.login_logout->uid));
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             case ES_EVENT_TYPE_NOTIFY_XPC_CONNECT:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
