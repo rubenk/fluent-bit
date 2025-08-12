@@ -1451,6 +1451,14 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     FLB_LOG_EVENT_UINT32_VALUE(event.setuid.uid));
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_SETGID:
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("gid"),
+                    FLB_LOG_EVENT_UINT32_VALUE(event.setgid.gid));
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
