@@ -268,74 +268,67 @@ static int encode_es_file_t(struct flb_log_event_encoder *encoder, const es_file
 static int encode_es_process_t(struct flb_log_event_encoder *encoder, const es_process_t *process) {
     flb_log_event_encoder_body_begin_map(encoder);
     flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("ppid"),
-                    FLB_LOG_EVENT_UINT64_VALUE(process->ppid));
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("ppid"),
+        FLB_LOG_EVENT_UINT64_VALUE(process->ppid));
     flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "audit_token");
+        encoder,
+        "audit_token");
     encode_audit_token_t(encoder, &process->audit_token);
     flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("group_id"),
-                    FLB_LOG_EVENT_UINT64_VALUE(process->group_id));
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("group_id"),
+        FLB_LOG_EVENT_UINT64_VALUE(process->group_id));
     flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("original_ppid"),
-                    FLB_LOG_EVENT_UINT64_VALUE(process->original_ppid));
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("original_ppid"),
+        FLB_LOG_EVENT_UINT64_VALUE(process->original_ppid));
     flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("codesigning_flags"),
-                    FLB_LOG_EVENT_UINT32_VALUE(process->codesigning_flags));
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("codesigning_flags"),
+        FLB_LOG_EVENT_UINT32_VALUE(process->codesigning_flags));
     if (process->executable) {
         flb_log_event_encoder_append_body_cstring(
-                        encoder,
-                        "executable");
+            encoder,
+            "executable");
         encode_es_file_t(encoder, process->executable);
     }
-    if (process->team_id.length > 0) {
-        flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("team_id"),
-                        FLB_LOG_EVENT_STRING_VALUE(process->team_id.data, process->team_id.length));
-    } else {
-        flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("team_id"),
-                        FLB_LOG_EVENT_NULL_VALUE());
-    }
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("team_id"),
+        FLB_LOG_EVENT_STRING_VALUE(process->team_id.data, process->team_id.length));
     flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "parent_audit_token");
+        encoder,
+        "parent_audit_token");
     encode_audit_token_t(encoder, &process->parent_audit_token);
 
     if (process->tty) {
         flb_log_event_encoder_append_body_cstring(
-                        encoder,
-                        "tty");
+            encoder,
+            "tty");
         encode_es_file_t(encoder, process->tty);
     }
     flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("signing_id"),
-                    FLB_LOG_EVENT_STRING_VALUE(process->signing_id.data, process->signing_id.length));
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("signing_id"),
+        FLB_LOG_EVENT_STRING_VALUE(process->signing_id.data, process->signing_id.length));
     flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("is_es_client"),
-                    FLB_LOG_EVENT_BOOLEAN_VALUE(process->is_es_client));
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("is_es_client"),
+        FLB_LOG_EVENT_BOOLEAN_VALUE(process->is_es_client));
     flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "responsible_audit_token");
+        encoder,
+        "responsible_audit_token");
     encode_audit_token_t(encoder, &process->responsible_audit_token);
 
     flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("is_platform_binary"),
-                    FLB_LOG_EVENT_BOOLEAN_VALUE(process->is_platform_binary));
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("is_platform_binary"),
+        FLB_LOG_EVENT_BOOLEAN_VALUE(process->is_platform_binary));
     flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("session_id"),
-                    FLB_LOG_EVENT_UINT64_VALUE(process->session_id));
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("session_id"),
+        FLB_LOG_EVENT_UINT64_VALUE(process->session_id));
     flb_log_event_encoder_body_commit_map(encoder);
     return 0;
 }
