@@ -34,6 +34,39 @@ struct flb_maces_config {
 };
 
 
+static int encode_btm_launch_item_t(struct flb_log_event_encoder *encoder, const es_btm_launch_item_t *item) {
+    flb_log_event_encoder_append_body_cstring(
+        encoder,
+        "item");
+    flb_log_event_encoder_body_begin_map(encoder);
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("item_type"),
+        FLB_LOG_EVENT_INT32_VALUE(item->item_type));
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("legacy"),
+        FLB_LOG_EVENT_BOOLEAN_VALUE(item->legacy));
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("managed"),
+        FLB_LOG_EVENT_BOOLEAN_VALUE(item->managed));
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("uid"),
+        FLB_LOG_EVENT_UINT32_VALUE(item->uid));
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("item_url"),
+        FLB_LOG_EVENT_STRING_VALUE(item->item_url.data, item->item_url.length));
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("app_url"),
+        FLB_LOG_EVENT_STRING_VALUE(item->app_url.data, item->app_url.length));
+    flb_log_event_encoder_body_commit_map(encoder);
+    return 0;
+}
+
 static int encode_timespec(struct flb_log_event_encoder *encoder, const struct timespec *ts) {
     char buf[31];
     struct tm tm;
@@ -1339,35 +1372,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                         "app");
                     encode_es_process_t(encoder, event.btm_launch_item_add->app);
                 }
-                flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "item");
-                flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("item_type"),
-                    FLB_LOG_EVENT_INT32_VALUE(event.btm_launch_item_add->item->item_type));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("legacy"),
-                    FLB_LOG_EVENT_BOOLEAN_VALUE(event.btm_launch_item_add->item->legacy));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("managed"),
-                    FLB_LOG_EVENT_BOOLEAN_VALUE(event.btm_launch_item_add->item->managed));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("uid"),
-                    FLB_LOG_EVENT_UINT32_VALUE(event.btm_launch_item_add->item->uid));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("item_url"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.btm_launch_item_add->item->item_url.data, event.btm_launch_item_add->item->item_url.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("app_url"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.btm_launch_item_add->item->app_url.data, event.btm_launch_item_add->item->app_url.length));
-                flb_log_event_encoder_body_commit_map(encoder);
+                encode_btm_launch_item_t(encoder, event.btm_launch_item_add->item);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("executable_path"),
