@@ -1393,6 +1393,37 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_REMOVE:
+                flb_log_event_encoder_body_begin_map(encoder);
+                if (event.btm_launch_item_remove->instigator) {
+                    flb_log_event_encoder_append_body_cstring(
+                        encoder,
+                        "instigator");
+                    encode_es_process_t(encoder, event.btm_launch_item_remove->instigator);
+                }
+                if (event.btm_launch_item_remove->app) {
+                    flb_log_event_encoder_append_body_cstring(
+                        encoder,
+                        "app");
+                    encode_es_process_t(encoder, event.btm_launch_item_remove->app);
+                }
+                encode_btm_launch_item_t(encoder, event.btm_launch_item_remove->item);
+                if (msg->version >= 8) {
+                    if (event.btm_launch_item_remove->instigator_token) {
+                        flb_log_event_encoder_append_body_cstring(
+                            encoder,
+                            "instigator_token");
+                        encode_audit_token_t(encoder, event.btm_launch_item_remove->instigator_token);
+                    }
+                    if (event.btm_launch_item_remove->app_token) {
+                        flb_log_event_encoder_append_body_cstring(
+                            encoder,
+                            "app_token");
+                        encode_audit_token_t(encoder, event.btm_launch_item_remove->app_token);
+                    }
+                }
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
