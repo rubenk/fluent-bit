@@ -1281,6 +1281,18 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     FLB_LOG_EVENT_UINT32_VALUE(event.openssh_logout->uid));
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_XPC_CONNECT:
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("service_name"),
+                    FLB_LOG_EVENT_STRING_VALUE(event.xpc_connect->service_name.data, event.xpc_connect->service_name.length));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("service_domain_type"),
+                    FLB_LOG_EVENT_INT32_VALUE(event.xpc_connect->service_domain_type));
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
