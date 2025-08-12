@@ -1161,10 +1161,10 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("success"),
                     FLB_LOG_EVENT_BOOLEAN_VALUE(event.screensharing_attach->success));
-                  flb_log_event_encoder_append_body_values(
-                      encoder,
-                      FLB_LOG_EVENT_CSTRING_VALUE("source_address_type"),
-                      FLB_LOG_EVENT_INT32_VALUE(event.screensharing_attach->source_address_type));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("source_address_type"),
+                    FLB_LOG_EVENT_INT32_VALUE(event.screensharing_attach->source_address_type));
                 if (event.screensharing_attach->source_address.length > 0) {
                   flb_log_event_encoder_append_body_values(
                       encoder,
