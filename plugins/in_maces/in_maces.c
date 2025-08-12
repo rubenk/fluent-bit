@@ -460,10 +460,12 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("modified"),
                     FLB_LOG_EVENT_BOOLEAN_VALUE(event.close.modified));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("was_mapped_writable"),
-                    FLB_LOG_EVENT_BOOLEAN_VALUE(event.close.was_mapped_writable));
+                if (msg->version >= 6) {
+                  flb_log_event_encoder_append_body_values(
+                      encoder,
+                      FLB_LOG_EVENT_CSTRING_VALUE("was_mapped_writable"),
+                      FLB_LOG_EVENT_BOOLEAN_VALUE(event.close.was_mapped_writable));
+                }
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
                     "target");
