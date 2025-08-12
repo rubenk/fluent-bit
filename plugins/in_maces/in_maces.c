@@ -287,12 +287,11 @@ static int encode_es_process_t(struct flb_log_event_encoder *encoder, const es_p
         encoder,
         FLB_LOG_EVENT_CSTRING_VALUE("codesigning_flags"),
         FLB_LOG_EVENT_UINT32_VALUE(process->codesigning_flags));
-    if (process->executable) {
-        flb_log_event_encoder_append_body_cstring(
-            encoder,
-            "executable");
-        encode_es_file_t(encoder, process->executable);
-    }
+    flb_log_event_encoder_append_body_cstring(
+        encoder,
+        "executable");
+    encode_es_file_t(encoder, process->executable);
+
     flb_log_event_encoder_append_body_values(
         encoder,
         FLB_LOG_EVENT_CSTRING_VALUE("team_id"),
