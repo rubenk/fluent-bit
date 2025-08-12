@@ -1358,6 +1358,23 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     FLB_LOG_EVENT_INT32_VALUE(event.xpc_connect->service_domain_type));
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_PTY_GRANT:
+                flb_log_event_encoder_body_begin_map(encoder);
+                // TODO: decode dev_t into major and minor
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("dev"),
+                    FLB_LOG_EVENT_INT32_VALUE(event.pty_grant.dev));
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
+            case ES_EVENT_TYPE_NOTIFY_PTY_CLOSE:
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("dev"),
+                    FLB_LOG_EVENT_INT32_VALUE(event.pty_close.dev));
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             case ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_ADD:
                 flb_log_event_encoder_body_begin_map(encoder);
                 if (event.btm_launch_item_add->instigator) {
