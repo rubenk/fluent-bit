@@ -1766,6 +1766,45 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 encode_audit_token_t(encoder, &od_delete_group->instigator_token);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_OD_MODIFY_PASSWORD:
+                es_event_od_modify_password_t *od_modify_password = event.od_modify_password;
+                flb_log_event_encoder_body_begin_map(encoder);
+                if (od_modify_password->instigator) {
+                  flb_log_event_encoder_append_body_cstring(
+                      encoder,
+                      "instigator");
+                  encode_es_process_t(encoder, od_modify_password->instigator);
+                }
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("error_code"),
+                    FLB_LOG_EVENT_INT32_VALUE(od_modify_password->error_code));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("account_type"),
+                    FLB_LOG_EVENT_INT32_VALUE(od_modify_password->account_type));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("account_name"),
+                    FLB_LOG_EVENT_STRING_VALUE(od_modify_password->account_name.data, od_modify_password->account_name.length));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
+                    FLB_LOG_EVENT_STRING_VALUE(od_modify_password->node_name.data, od_modify_password->node_name.length));
+                if(od_modify_password->db_path.length > 0) {
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("db_path"),
+                        FLB_LOG_EVENT_STRING_VALUE(od_modify_password->db_path.data, od_modify_password->db_path.length));
+                }
+                if (msg->version >= 8) {
+                  flb_log_event_encoder_append_body_cstring(
+                      encoder,
+                      "instigator_token");
+                  encode_audit_token_t(encoder, &od_modify_password->instigator_token);
+                }
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
