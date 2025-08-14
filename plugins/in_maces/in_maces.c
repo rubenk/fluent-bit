@@ -1559,6 +1559,71 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_SUDO:
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("success"),
+                    FLB_LOG_EVENT_BOOLEAN_VALUE(event.sudo->success));
+                if(!event.sudo->success) {
+                    flb_log_event_encoder_append_body_cstring(
+                        encoder,
+                        "reject_info");
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("plugin_name"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.sudo->reject_info->plugin_name.data, event.sudo->reject_info->plugin_name.length));
+                        flb_log_event_encoder_append_body_values(
+                            encoder,
+                            FLB_LOG_EVENT_CSTRING_VALUE("plugin_type"),
+                            FLB_LOG_EVENT_INT32_VALUE(event.sudo->reject_info->plugin_type));
+                        flb_log_event_encoder_append_body_values(
+                            encoder,
+                            FLB_LOG_EVENT_CSTRING_VALUE("failure_message"),
+                            FLB_LOG_EVENT_STRING_VALUE(event.sudo->reject_info->failure_message.data, event.sudo->reject_info->failure_message.length));
+                    flb_log_event_encoder_body_commit_map(encoder);
+                }
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("has_from_uid"),
+                    FLB_LOG_EVENT_BOOLEAN_VALUE(event.sudo->has_from_uid));
+                if (event.sudo->has_from_uid) {
+                  flb_log_event_encoder_append_body_values(
+                      encoder,
+                      FLB_LOG_EVENT_CSTRING_VALUE("from_uid"),
+                      FLB_LOG_EVENT_UINT32_VALUE(event.sudo->from_uid.uid));
+                }
+                if (event.sudo->from_username.length > 0) {
+                  flb_log_event_encoder_append_body_values(
+                      encoder,
+                      FLB_LOG_EVENT_CSTRING_VALUE("from_username"),
+                      FLB_LOG_EVENT_STRING_VALUE(event.sudo->from_username.data, event.sudo->from_username.length));
+                }
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("has_to_uid"),
+                    FLB_LOG_EVENT_BOOLEAN_VALUE(event.sudo->has_to_uid));
+                if (event.sudo->has_to_uid) {
+                  flb_log_event_encoder_append_body_values(
+                      encoder,
+                      FLB_LOG_EVENT_CSTRING_VALUE("to_uid"),
+                      FLB_LOG_EVENT_UINT32_VALUE(event.sudo->to_uid.uid));
+                }
+                if (event.sudo->to_username.length > 0) {
+                  flb_log_event_encoder_append_body_values(
+                      encoder,
+                      FLB_LOG_EVENT_CSTRING_VALUE("to_username"),
+                      FLB_LOG_EVENT_STRING_VALUE(event.sudo->to_username.data, event.sudo->to_username.length));
+                }
+                if(event.sudo->command.length > 0) {
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("command"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.sudo->command.data, event.sudo->command.length));
+                }
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
