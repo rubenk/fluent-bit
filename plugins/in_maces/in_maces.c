@@ -1567,6 +1567,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     FLB_LOG_EVENT_CSTRING_VALUE("success"),
                     FLB_LOG_EVENT_BOOLEAN_VALUE(sudo->success));
                 if(!sudo->success) {
+                    es_sudo_reject_info_t *reject_info = sudo->reject_info;
                     flb_log_event_encoder_append_body_cstring(
                         encoder,
                         "reject_info");
@@ -1574,15 +1575,15 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     flb_log_event_encoder_append_body_values(
                         encoder,
                         FLB_LOG_EVENT_CSTRING_VALUE("plugin_name"),
-                        FLB_LOG_EVENT_STRING_VALUE(sudo->reject_info->plugin_name.data, sudo->reject_info->plugin_name.length));
+                        FLB_LOG_EVENT_STRING_VALUE(reject_info->plugin_name.data, reject_info->plugin_name.length));
                         flb_log_event_encoder_append_body_values(
                             encoder,
                             FLB_LOG_EVENT_CSTRING_VALUE("plugin_type"),
-                            FLB_LOG_EVENT_INT32_VALUE(sudo->reject_info->plugin_type));
+                            FLB_LOG_EVENT_INT32_VALUE(reject_info->plugin_type));
                         flb_log_event_encoder_append_body_values(
                             encoder,
                             FLB_LOG_EVENT_CSTRING_VALUE("failure_message"),
-                            FLB_LOG_EVENT_STRING_VALUE(sudo->reject_info->failure_message.data, sudo->reject_info->failure_message.length));
+                            FLB_LOG_EVENT_STRING_VALUE(reject_info->failure_message.data, reject_info->failure_message.length));
                     flb_log_event_encoder_body_commit_map(encoder);
                 }
                 flb_log_event_encoder_append_body_values(
