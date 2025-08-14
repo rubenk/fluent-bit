@@ -1634,6 +1634,39 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_OD_DELETE_USER:
+                es_event_od_delete_user_t *od_delete_user = event.od_delete_user;
+                flb_log_event_encoder_body_begin_map(encoder);
+                if (od_delete_user->instigator) {
+                  flb_log_event_encoder_append_body_cstring(
+                      encoder,
+                      "instigator");
+                  encode_es_process_t(encoder, od_delete_user->instigator);
+                }
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("error_code"),
+                    FLB_LOG_EVENT_INT32_VALUE(od_delete_user->error_code));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("user_name"),
+                    FLB_LOG_EVENT_STRING_VALUE(od_delete_user->user_name.data, od_delete_user->user_name.length));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
+                    FLB_LOG_EVENT_STRING_VALUE(od_delete_user->node_name.data, od_delete_user->node_name.length));
+                if(od_delete_user->db_path.length > 0) {
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("db_path"),
+                        FLB_LOG_EVENT_STRING_VALUE(od_delete_user->db_path.data, od_delete_user->db_path.length));
+                }
+                flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "instigator_token");
+                encode_audit_token_t(encoder, &od_delete_user->instigator_token);
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
