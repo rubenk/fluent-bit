@@ -1668,7 +1668,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             case ES_EVENT_TYPE_NOTIFY_OD_CREATE_USER:
-                es_event_od_delete_user_t *od_create_user = event.od_create_user;
+                es_event_od_create_user_t *od_create_user = event.od_create_user;
                 flb_log_event_encoder_body_begin_map(encoder);
                 if (od_create_user->instigator) {
                   flb_log_event_encoder_append_body_cstring(
