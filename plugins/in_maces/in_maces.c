@@ -1896,6 +1896,10 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     FLB_LOG_EVENT_INT32_VALUE(od_attribute_value_add->error_code));
                 flb_log_event_encoder_append_body_values(
                     encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("record_type"),
+                    FLB_LOG_EVENT_INT32_VALUE(od_attribute_value_add->record_type));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("record_name"),
                     FLB_LOG_EVENT_STRING_VALUE(od_attribute_value_add->record_name.data, od_attribute_value_add->record_name.length));
                 flb_log_event_encoder_append_body_values(
@@ -1939,6 +1943,10 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("error_code"),
                     FLB_LOG_EVENT_INT32_VALUE(od_attribute_value_remove->error_code));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("record_type"),
+                    FLB_LOG_EVENT_INT32_VALUE(od_attribute_value_remove->record_type));
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("record_name"),
