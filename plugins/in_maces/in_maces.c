@@ -2065,11 +2065,12 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                       FLB_LOG_EVENT_CSTRING_VALUE("member_value"),
                       FLB_LOG_EVENT_STRING_VALUE(od_group_add->member->member_value.name.data, od_group_add->member->member_value.name.length));
                 } else {
-                  // TODO: format uuid_t (char [16]) in hex
+                  uuid_string_t uuidstr;
+                  uuid_unparse(od_group_add->member->member_value.uuid, uuidstr);
                   flb_log_event_encoder_append_body_values(
                       encoder,
                       FLB_LOG_EVENT_CSTRING_VALUE("member_value"),
-                      FLB_LOG_EVENT_NULL_VALUE());
+                      FLB_LOG_EVENT_CSTRING_VALUE(uuidstr));
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 flb_log_event_encoder_append_body_values(
