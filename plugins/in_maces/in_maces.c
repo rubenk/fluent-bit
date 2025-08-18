@@ -348,6 +348,17 @@ static int encode_es_process_t(struct flb_log_event_encoder *encoder, const es_p
         encoder,
         FLB_LOG_EVENT_CSTRING_VALUE("is_es_client"),
         FLB_LOG_EVENT_BOOLEAN_VALUE(process->is_es_client));
+    static const char hex_digits[] = "0123456789ABCDEF";
+    char cdhash[41];
+    for (size_t i = 0; i < 20; i++) {
+      cdhash[i * 2] = hex_digits[process->cdhash[i] >> 4 & 0x0F];
+      cdhash[i * 2 + 1] = hex_digits[process->cdhash[i] & 0x0F];
+    }
+    cdhash[40] = '\0';
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("cdhash"),
+        FLB_LOG_EVENT_CSTRING_VALUE(cdhash));
     flb_log_event_encoder_append_body_cstring(
         encoder,
         "responsible_audit_token");
