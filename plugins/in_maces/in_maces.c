@@ -2165,6 +2165,55 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_AUTHENTICATION:
+                es_event_authentication_t *authentication = event.authentication;
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("success"),
+                    FLB_LOG_EVENT_BOOLEAN_VALUE(authentication->success));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("type"),
+                    FLB_LOG_EVENT_INT32_VALUE(authentication->type));
+                switch(authentication->type) {
+                    case ES_AUTHENTICATION_TYPE_OD:
+                      if (authentication->data.od->instigator) {
+                        flb_log_event_encoder_append_body_cstring(
+                            encoder,
+                            "instigator");
+                        encode_es_process_t(encoder, authentication->data.od->instigator);
+                      }
+                      flb_log_event_encoder_append_body_values(
+                          encoder,
+                          FLB_LOG_EVENT_CSTRING_VALUE("record_type"),
+                          FLB_LOG_EVENT_STRING_VALUE(authentication->data.od->record_type.data, authentication->data.od->record_type.length));
+                      flb_log_event_encoder_append_body_values(
+                          encoder,
+                          FLB_LOG_EVENT_CSTRING_VALUE("record_name"),
+                          FLB_LOG_EVENT_STRING_VALUE(authentication->data.od->record_name.data, authentication->data.od->record_name.length));
+                      flb_log_event_encoder_append_body_values(
+                          encoder,
+                          FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
+                          FLB_LOG_EVENT_STRING_VALUE(authentication->data.od->node_name.data, authentication->data.od->node_name.length));
+                      if(authentication->data.od->db_path.length > 0) {
+                          flb_log_event_encoder_append_body_values(
+                              encoder,
+                              FLB_LOG_EVENT_CSTRING_VALUE("db_path"),
+                              FLB_LOG_EVENT_STRING_VALUE(authentication->data.od->db_path.data, authentication->data.od->db_path.length));
+                      }
+                      if (msg->version >= 8) {
+                          flb_log_event_encoder_append_body_cstring(
+                              encoder,
+                              "instigator_token");
+                          encode_audit_token_t(encoder, &authentication->data.od->instigator_token);
+                      }
+                      break;
+                    default:
+                      break;
+                }
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
