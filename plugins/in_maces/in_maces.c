@@ -2371,9 +2371,31 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
     return 0;
 }
 
+static int in_maces_exit(void *data, struct flb_config *config)
+{
+    struct flb_maces_config *ctx = data;
+
+    if (!ctx) {
+        return 0;
+    }
+
+    if (ctx->client) {
+        es_unsubscribe_all(ctx->client);
+        es_delete_client(ctx->client);
+    }
+
+    if (ctx->encoder) {
+        flb_log_event_encoder_destroy(ctx->encoder);
+    }
+
+    flb_free(ctx);
+    return 0;
+}
+
 /* Plugin registration */
 struct flb_input_plugin in_maces_plugin = {
     .name        = "maces",
     .description = "MacOS Endpoint Security input plugin",
     .cb_init     = in_maces_init,
+    .cb_exit     = in_maces_exit,
 };
