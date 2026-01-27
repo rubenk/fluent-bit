@@ -1191,230 +1191,252 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             case ES_EVENT_TYPE_NOTIFY_LW_SESSION_LOGIN:
-                flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("username"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.lw_session_login->username.data, event.lw_session_login->username.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("graphical_session_id"),
-                    FLB_LOG_EVENT_UINT32_VALUE(event.lw_session_login->graphical_session_id));
-                flb_log_event_encoder_body_commit_map(encoder);
+                if (event.lw_session_login) {
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("username"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.lw_session_login->username.data, event.lw_session_login->username.length));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("graphical_session_id"),
+                        FLB_LOG_EVENT_UINT32_VALUE(event.lw_session_login->graphical_session_id));
+                    flb_log_event_encoder_body_commit_map(encoder);
+                }
                 break;
             case ES_EVENT_TYPE_NOTIFY_LW_SESSION_LOGOUT:
-                flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("username"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.lw_session_logout->username.data, event.lw_session_logout->username.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("graphical_session_id"),
-                    FLB_LOG_EVENT_UINT32_VALUE(event.lw_session_logout->graphical_session_id));
-                flb_log_event_encoder_body_commit_map(encoder);
+                if (event.lw_session_logout) {
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("username"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.lw_session_logout->username.data, event.lw_session_logout->username.length));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("graphical_session_id"),
+                        FLB_LOG_EVENT_UINT32_VALUE(event.lw_session_logout->graphical_session_id));
+                    flb_log_event_encoder_body_commit_map(encoder);
+                }
                 break;
             case ES_EVENT_TYPE_NOTIFY_LW_SESSION_LOCK:
-                flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("username"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.lw_session_lock->username.data, event.lw_session_lock->username.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("graphical_session_id"),
-                    FLB_LOG_EVENT_UINT32_VALUE(event.lw_session_lock->graphical_session_id));
-                flb_log_event_encoder_body_commit_map(encoder);
+                if (event.lw_session_lock) {
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("username"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.lw_session_lock->username.data, event.lw_session_lock->username.length));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("graphical_session_id"),
+                        FLB_LOG_EVENT_UINT32_VALUE(event.lw_session_lock->graphical_session_id));
+                    flb_log_event_encoder_body_commit_map(encoder);
+                }
                 break;
             case ES_EVENT_TYPE_NOTIFY_LW_SESSION_UNLOCK:
-                flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("username"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.lw_session_unlock->username.data, event.lw_session_unlock->username.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("graphical_session_id"),
-                    FLB_LOG_EVENT_UINT32_VALUE(event.lw_session_unlock->graphical_session_id));
-                flb_log_event_encoder_body_commit_map(encoder);
+                if (event.lw_session_unlock) {
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("username"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.lw_session_unlock->username.data, event.lw_session_unlock->username.length));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("graphical_session_id"),
+                        FLB_LOG_EVENT_UINT32_VALUE(event.lw_session_unlock->graphical_session_id));
+                    flb_log_event_encoder_body_commit_map(encoder);
+                }
                 break;
             case ES_EVENT_TYPE_NOTIFY_SCREENSHARING_ATTACH:
-                flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("success"),
-                    FLB_LOG_EVENT_BOOLEAN_VALUE(event.screensharing_attach->success));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("source_address_type"),
-                    FLB_LOG_EVENT_INT32_VALUE(event.screensharing_attach->source_address_type));
-                if (event.screensharing_attach->source_address.length > 0) {
-                  flb_log_event_encoder_append_body_values(
-                      encoder,
-                      FLB_LOG_EVENT_CSTRING_VALUE("source_address"),
-                      FLB_LOG_EVENT_STRING_VALUE(event.screensharing_attach->source_address.data, event.screensharing_attach->source_address.length));
+                if (event.screensharing_attach) {
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("success"),
+                        FLB_LOG_EVENT_BOOLEAN_VALUE(event.screensharing_attach->success));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("source_address_type"),
+                        FLB_LOG_EVENT_INT32_VALUE(event.screensharing_attach->source_address_type));
+                    if (event.screensharing_attach->source_address.length > 0) {
+                      flb_log_event_encoder_append_body_values(
+                          encoder,
+                          FLB_LOG_EVENT_CSTRING_VALUE("source_address"),
+                          FLB_LOG_EVENT_STRING_VALUE(event.screensharing_attach->source_address.data, event.screensharing_attach->source_address.length));
+                    }
+                    if (event.screensharing_attach->viewer_appleid.length > 0) {
+                      flb_log_event_encoder_append_body_values(
+                          encoder,
+                          FLB_LOG_EVENT_CSTRING_VALUE("viewer_appleid"),
+                          FLB_LOG_EVENT_STRING_VALUE(event.screensharing_attach->viewer_appleid.data, event.screensharing_attach->viewer_appleid.length));
+                    }
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("authentication_type"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.screensharing_attach->authentication_type.data, event.screensharing_attach->authentication_type.length));
+                    if (event.screensharing_attach->authentication_username.length > 0) {
+                      flb_log_event_encoder_append_body_values(
+                          encoder,
+                          FLB_LOG_EVENT_CSTRING_VALUE("authentication_username"),
+                          FLB_LOG_EVENT_STRING_VALUE(event.screensharing_attach->authentication_username.data, event.screensharing_attach->authentication_username.length));
+                    }
+                    if (event.screensharing_attach->session_username.length > 0) {
+                      flb_log_event_encoder_append_body_values(
+                          encoder,
+                          FLB_LOG_EVENT_CSTRING_VALUE("session_username"),
+                          FLB_LOG_EVENT_STRING_VALUE(event.screensharing_attach->session_username.data, event.screensharing_attach->session_username.length));
+                    }
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("existing_session"),
+                        FLB_LOG_EVENT_BOOLEAN_VALUE(event.screensharing_attach->existing_session));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("graphical_session_id"),
+                        FLB_LOG_EVENT_UINT32_VALUE(event.screensharing_attach->graphical_session_id));
+                    flb_log_event_encoder_body_commit_map(encoder);
                 }
-                if (event.screensharing_attach->viewer_appleid.length > 0) {
-                  flb_log_event_encoder_append_body_values(
-                      encoder,
-                      FLB_LOG_EVENT_CSTRING_VALUE("viewer_appleid"),
-                      FLB_LOG_EVENT_STRING_VALUE(event.screensharing_attach->viewer_appleid.data, event.screensharing_attach->viewer_appleid.length));
-                }
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("authentication_type"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.screensharing_attach->authentication_type.data, event.screensharing_attach->authentication_type.length));
-                if (event.screensharing_attach->authentication_username.length > 0) {
-                  flb_log_event_encoder_append_body_values(
-                      encoder,
-                      FLB_LOG_EVENT_CSTRING_VALUE("authentication_username"),
-                      FLB_LOG_EVENT_STRING_VALUE(event.screensharing_attach->authentication_username.data, event.screensharing_attach->authentication_username.length));
-                }
-                if (event.screensharing_attach->session_username.length > 0) {
-                  flb_log_event_encoder_append_body_values(
-                      encoder,
-                      FLB_LOG_EVENT_CSTRING_VALUE("session_username"),
-                      FLB_LOG_EVENT_STRING_VALUE(event.screensharing_attach->session_username.data, event.screensharing_attach->session_username.length));
-                }
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("existing_session"),
-                    FLB_LOG_EVENT_BOOLEAN_VALUE(event.screensharing_attach->existing_session));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("graphical_session_id"),
-                    FLB_LOG_EVENT_UINT32_VALUE(event.screensharing_attach->graphical_session_id));
-                flb_log_event_encoder_body_commit_map(encoder);
                 break;
             case ES_EVENT_TYPE_NOTIFY_SCREENSHARING_DETACH:
-                flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("source_address_type"),
-                    FLB_LOG_EVENT_INT32_VALUE(event.screensharing_detach->source_address_type));
-                if (event.screensharing_detach->source_address.length > 0) {
-                  flb_log_event_encoder_append_body_values(
-                      encoder,
-                      FLB_LOG_EVENT_CSTRING_VALUE("source_address"),
-                      FLB_LOG_EVENT_STRING_VALUE(event.screensharing_detach->source_address.data, event.screensharing_detach->source_address.length));
+                if (event.screensharing_detach) {
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("source_address_type"),
+                        FLB_LOG_EVENT_INT32_VALUE(event.screensharing_detach->source_address_type));
+                    if (event.screensharing_detach->source_address.length > 0) {
+                      flb_log_event_encoder_append_body_values(
+                          encoder,
+                          FLB_LOG_EVENT_CSTRING_VALUE("source_address"),
+                          FLB_LOG_EVENT_STRING_VALUE(event.screensharing_detach->source_address.data, event.screensharing_detach->source_address.length));
+                    }
+                    if (event.screensharing_detach->viewer_appleid.length > 0) {
+                      flb_log_event_encoder_append_body_values(
+                          encoder,
+                          FLB_LOG_EVENT_CSTRING_VALUE("viewer_appleid"),
+                          FLB_LOG_EVENT_STRING_VALUE(event.screensharing_detach->viewer_appleid.data, event.screensharing_detach->viewer_appleid.length));
+                    }
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("graphical_session_id"),
+                        FLB_LOG_EVENT_UINT32_VALUE(event.screensharing_detach->graphical_session_id));
+                    flb_log_event_encoder_body_commit_map(encoder);
                 }
-                if (event.screensharing_detach->viewer_appleid.length > 0) {
-                  flb_log_event_encoder_append_body_values(
-                      encoder,
-                      FLB_LOG_EVENT_CSTRING_VALUE("viewer_appleid"),
-                      FLB_LOG_EVENT_STRING_VALUE(event.screensharing_detach->viewer_appleid.data, event.screensharing_detach->viewer_appleid.length));
-                }
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("graphical_session_id"),
-                    FLB_LOG_EVENT_UINT32_VALUE(event.screensharing_detach->graphical_session_id));
-                flb_log_event_encoder_body_commit_map(encoder);
                 break;
             case ES_EVENT_TYPE_NOTIFY_OPENSSH_LOGIN:
-                flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("success"),
-                    FLB_LOG_EVENT_BOOLEAN_VALUE(event.openssh_login->success));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("result_type"),
-                    FLB_LOG_EVENT_INT32_VALUE(event.openssh_login->result_type));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("source_address_type"),
-                    FLB_LOG_EVENT_INT32_VALUE(event.openssh_login->source_address_type));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("source_address"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.openssh_login->source_address.data, event.openssh_login->source_address.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("username"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.openssh_login->username.data, event.openssh_login->username.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("has_uid"),
-                    FLB_LOG_EVENT_BOOLEAN_VALUE(event.openssh_login->has_uid));
-                if (event.openssh_login->has_uid) {
-                  flb_log_event_encoder_append_body_values(
-                      encoder,
-                      FLB_LOG_EVENT_CSTRING_VALUE("uid"),
-                      FLB_LOG_EVENT_UINT32_VALUE(event.openssh_login->uid.uid));
+                if (event.openssh_login) {
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("success"),
+                        FLB_LOG_EVENT_BOOLEAN_VALUE(event.openssh_login->success));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("result_type"),
+                        FLB_LOG_EVENT_INT32_VALUE(event.openssh_login->result_type));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("source_address_type"),
+                        FLB_LOG_EVENT_INT32_VALUE(event.openssh_login->source_address_type));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("source_address"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.openssh_login->source_address.data, event.openssh_login->source_address.length));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("username"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.openssh_login->username.data, event.openssh_login->username.length));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("has_uid"),
+                        FLB_LOG_EVENT_BOOLEAN_VALUE(event.openssh_login->has_uid));
+                    if (event.openssh_login->has_uid) {
+                      flb_log_event_encoder_append_body_values(
+                          encoder,
+                          FLB_LOG_EVENT_CSTRING_VALUE("uid"),
+                          FLB_LOG_EVENT_UINT32_VALUE(event.openssh_login->uid.uid));
+                    }
+                    flb_log_event_encoder_body_commit_map(encoder);
                 }
-                flb_log_event_encoder_body_commit_map(encoder);
                 break;
             case ES_EVENT_TYPE_NOTIFY_OPENSSH_LOGOUT:
-                flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("source_address_type"),
-                    FLB_LOG_EVENT_INT32_VALUE(event.openssh_logout->source_address_type));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("source_address"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.openssh_logout->source_address.data, event.openssh_logout->source_address.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("username"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.openssh_logout->username.data, event.openssh_logout->username.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("uid"),
-                    FLB_LOG_EVENT_UINT32_VALUE(event.openssh_logout->uid));
-                flb_log_event_encoder_body_commit_map(encoder);
+                if (event.openssh_logout) {
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("source_address_type"),
+                        FLB_LOG_EVENT_INT32_VALUE(event.openssh_logout->source_address_type));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("source_address"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.openssh_logout->source_address.data, event.openssh_logout->source_address.length));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("username"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.openssh_logout->username.data, event.openssh_logout->username.length));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("uid"),
+                        FLB_LOG_EVENT_UINT32_VALUE(event.openssh_logout->uid));
+                    flb_log_event_encoder_body_commit_map(encoder);
+                }
                 break;
             case ES_EVENT_TYPE_NOTIFY_LOGIN_LOGIN:
-                flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("success"),
-                    FLB_LOG_EVENT_BOOLEAN_VALUE(event.login_login->success));
-                if (event.login_login->failure_message.length > 0) {
-                  flb_log_event_encoder_append_body_values(
-                      encoder,
-                      FLB_LOG_EVENT_CSTRING_VALUE("failure_message"),
-                      FLB_LOG_EVENT_STRING_VALUE(event.login_login->failure_message.data, event.login_login->failure_message.length));
+                if (event.login_login) {
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("success"),
+                        FLB_LOG_EVENT_BOOLEAN_VALUE(event.login_login->success));
+                    if (event.login_login->failure_message.length > 0) {
+                      flb_log_event_encoder_append_body_values(
+                          encoder,
+                          FLB_LOG_EVENT_CSTRING_VALUE("failure_message"),
+                          FLB_LOG_EVENT_STRING_VALUE(event.login_login->failure_message.data, event.login_login->failure_message.length));
+                    }
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("username"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.login_login->username.data, event.login_login->username.length));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("has_uid"),
+                        FLB_LOG_EVENT_BOOLEAN_VALUE(event.login_login->has_uid));
+                    if (event.login_login->has_uid) {
+                      flb_log_event_encoder_append_body_values(
+                          encoder,
+                          FLB_LOG_EVENT_CSTRING_VALUE("uid"),
+                          FLB_LOG_EVENT_UINT32_VALUE(event.login_login->uid.uid));
+                    }
+                    flb_log_event_encoder_body_commit_map(encoder);
                 }
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("username"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.login_login->username.data, event.login_login->username.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("has_uid"),
-                    FLB_LOG_EVENT_BOOLEAN_VALUE(event.login_login->has_uid));
-                if (event.login_login->has_uid) {
-                  flb_log_event_encoder_append_body_values(
-                      encoder,
-                      FLB_LOG_EVENT_CSTRING_VALUE("uid"),
-                      FLB_LOG_EVENT_UINT32_VALUE(event.login_login->uid.uid));
-                }
-                flb_log_event_encoder_body_commit_map(encoder);
                 break;
             case ES_EVENT_TYPE_NOTIFY_LOGIN_LOGOUT:
-                flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("username"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.login_logout->username.data, event.login_logout->username.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("uid"),
-                    FLB_LOG_EVENT_UINT32_VALUE(event.login_logout->uid));
-                flb_log_event_encoder_body_commit_map(encoder);
+                if (event.login_logout) {
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("username"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.login_logout->username.data, event.login_logout->username.length));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("uid"),
+                        FLB_LOG_EVENT_UINT32_VALUE(event.login_logout->uid));
+                    flb_log_event_encoder_body_commit_map(encoder);
+                }
                 break;
             case ES_EVENT_TYPE_NOTIFY_XPC_CONNECT:
-                flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("service_name"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.xpc_connect->service_name.data, event.xpc_connect->service_name.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("service_domain_type"),
-                    FLB_LOG_EVENT_INT32_VALUE(event.xpc_connect->service_domain_type));
-                flb_log_event_encoder_body_commit_map(encoder);
+                if (event.xpc_connect) {
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("service_name"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.xpc_connect->service_name.data, event.xpc_connect->service_name.length));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("service_domain_type"),
+                        FLB_LOG_EVENT_INT32_VALUE(event.xpc_connect->service_domain_type));
+                    flb_log_event_encoder_body_commit_map(encoder);
+                }
                 break;
             case ES_EVENT_TYPE_NOTIFY_PTY_GRANT:
                 flb_log_event_encoder_body_begin_map(encoder);
@@ -1434,70 +1456,74 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             case ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_ADD:
-                flb_log_event_encoder_body_begin_map(encoder);
-                if (event.btm_launch_item_add->instigator) {
-                    flb_log_event_encoder_append_body_cstring(
-                        encoder,
-                        "instigator");
-                    encode_es_process_t(encoder, event.btm_launch_item_add->instigator);
-                }
-                if (event.btm_launch_item_add->app) {
-                    flb_log_event_encoder_append_body_cstring(
-                        encoder,
-                        "app");
-                    encode_es_process_t(encoder, event.btm_launch_item_add->app);
-                }
-                encode_btm_launch_item_t(encoder, event.btm_launch_item_add->item);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("executable_path"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.btm_launch_item_add->executable_path.data, event.btm_launch_item_add->executable_path.length));
-                if (msg->version >= 8) {
-                    if (event.btm_launch_item_add->instigator_token) {
+                if (event.btm_launch_item_add) {
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    if (event.btm_launch_item_add->instigator) {
                         flb_log_event_encoder_append_body_cstring(
                             encoder,
-                            "instigator_token");
-                        encode_audit_token_t(encoder, event.btm_launch_item_add->instigator_token);
+                            "instigator");
+                        encode_es_process_t(encoder, event.btm_launch_item_add->instigator);
                     }
-                    if (event.btm_launch_item_add->app_token) {
+                    if (event.btm_launch_item_add->app) {
                         flb_log_event_encoder_append_body_cstring(
                             encoder,
-                            "app_token");
-                        encode_audit_token_t(encoder, event.btm_launch_item_add->app_token);
+                            "app");
+                        encode_es_process_t(encoder, event.btm_launch_item_add->app);
                     }
+                    encode_btm_launch_item_t(encoder, event.btm_launch_item_add->item);
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("executable_path"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.btm_launch_item_add->executable_path.data, event.btm_launch_item_add->executable_path.length));
+                    if (msg->version >= 8) {
+                        if (event.btm_launch_item_add->instigator_token) {
+                            flb_log_event_encoder_append_body_cstring(
+                                encoder,
+                                "instigator_token");
+                            encode_audit_token_t(encoder, event.btm_launch_item_add->instigator_token);
+                        }
+                        if (event.btm_launch_item_add->app_token) {
+                            flb_log_event_encoder_append_body_cstring(
+                                encoder,
+                                "app_token");
+                            encode_audit_token_t(encoder, event.btm_launch_item_add->app_token);
+                        }
+                    }
+                    flb_log_event_encoder_body_commit_map(encoder);
                 }
-                flb_log_event_encoder_body_commit_map(encoder);
                 break;
             case ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_REMOVE:
-                flb_log_event_encoder_body_begin_map(encoder);
-                if (event.btm_launch_item_remove->instigator) {
-                    flb_log_event_encoder_append_body_cstring(
-                        encoder,
-                        "instigator");
-                    encode_es_process_t(encoder, event.btm_launch_item_remove->instigator);
-                }
-                if (event.btm_launch_item_remove->app) {
-                    flb_log_event_encoder_append_body_cstring(
-                        encoder,
-                        "app");
-                    encode_es_process_t(encoder, event.btm_launch_item_remove->app);
-                }
-                encode_btm_launch_item_t(encoder, event.btm_launch_item_remove->item);
-                if (msg->version >= 8) {
-                    if (event.btm_launch_item_remove->instigator_token) {
+                if (event.btm_launch_item_remove) {
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    if (event.btm_launch_item_remove->instigator) {
                         flb_log_event_encoder_append_body_cstring(
                             encoder,
-                            "instigator_token");
-                        encode_audit_token_t(encoder, event.btm_launch_item_remove->instigator_token);
+                            "instigator");
+                        encode_es_process_t(encoder, event.btm_launch_item_remove->instigator);
                     }
-                    if (event.btm_launch_item_remove->app_token) {
+                    if (event.btm_launch_item_remove->app) {
                         flb_log_event_encoder_append_body_cstring(
                             encoder,
-                            "app_token");
-                        encode_audit_token_t(encoder, event.btm_launch_item_remove->app_token);
+                            "app");
+                        encode_es_process_t(encoder, event.btm_launch_item_remove->app);
                     }
+                    encode_btm_launch_item_t(encoder, event.btm_launch_item_remove->item);
+                    if (msg->version >= 8) {
+                        if (event.btm_launch_item_remove->instigator_token) {
+                            flb_log_event_encoder_append_body_cstring(
+                                encoder,
+                                "instigator_token");
+                            encode_audit_token_t(encoder, event.btm_launch_item_remove->instigator_token);
+                        }
+                        if (event.btm_launch_item_remove->app_token) {
+                            flb_log_event_encoder_append_body_cstring(
+                                encoder,
+                                "app_token");
+                            encode_audit_token_t(encoder, event.btm_launch_item_remove->app_token);
+                        }
+                    }
+                    flb_log_event_encoder_body_commit_map(encoder);
                 }
-                flb_log_event_encoder_body_commit_map(encoder);
                 break;
             case ES_EVENT_TYPE_NOTIFY_SETUID:
                 flb_log_event_encoder_body_begin_map(encoder);
@@ -1556,67 +1582,70 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             case ES_EVENT_TYPE_NOTIFY_SU:
-                flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("success"),
-                    FLB_LOG_EVENT_BOOLEAN_VALUE(event.su->success));
-                if(!event.su->success) {
+                if (event.su) {
+                    flb_log_event_encoder_body_begin_map(encoder);
                     flb_log_event_encoder_append_body_values(
                         encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("failure_message"),
-                        FLB_LOG_EVENT_STRING_VALUE(event.su->failure_message.data, event.su->failure_message.length));
-                }
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("from_uid"),
-                    FLB_LOG_EVENT_UINT32_VALUE(event.su->from_uid));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("from_username"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.su->from_username.data, event.su->from_username.length));
-                if (event.su->has_to_uid) {
-                  flb_log_event_encoder_append_body_values(
-                      encoder,
-                      FLB_LOG_EVENT_CSTRING_VALUE("uid"),
-                      FLB_LOG_EVENT_UINT32_VALUE(event.su->to_uid.uid));
-                }
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("to_username"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.su->to_username.data, event.su->to_username.length));
-                if(event.su->success) {
+                        FLB_LOG_EVENT_CSTRING_VALUE("success"),
+                        FLB_LOG_EVENT_BOOLEAN_VALUE(event.su->success));
+                    if(!event.su->success) {
+                        flb_log_event_encoder_append_body_values(
+                            encoder,
+                            FLB_LOG_EVENT_CSTRING_VALUE("failure_message"),
+                            FLB_LOG_EVENT_STRING_VALUE(event.su->failure_message.data, event.su->failure_message.length));
+                    }
                     flb_log_event_encoder_append_body_values(
                         encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("shell"),
-                        FLB_LOG_EVENT_STRING_VALUE(event.su->shell.data, event.su->shell.length));
-                    flb_log_event_encoder_append_body_cstring(
+                        FLB_LOG_EVENT_CSTRING_VALUE("from_uid"),
+                        FLB_LOG_EVENT_UINT32_VALUE(event.su->from_uid));
+                    flb_log_event_encoder_append_body_values(
                         encoder,
-                        "argv");
-                    flb_log_event_encoder_body_begin_array(encoder);
-                    for(size_t i = 0; i < event.su->argc; i++) {
-                    flb_log_event_encoder_append_body_string(
-                        encoder,
-                        event.su->argv[i].data,
-                        event.su->argv[i].length);
+                        FLB_LOG_EVENT_CSTRING_VALUE("from_username"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.su->from_username.data, event.su->from_username.length));
+                    if (event.su->has_to_uid) {
+                      flb_log_event_encoder_append_body_values(
+                          encoder,
+                          FLB_LOG_EVENT_CSTRING_VALUE("uid"),
+                          FLB_LOG_EVENT_UINT32_VALUE(event.su->to_uid.uid));
                     }
-                    flb_log_event_encoder_body_commit_array(encoder);
-                    flb_log_event_encoder_append_body_cstring(
+                    flb_log_event_encoder_append_body_values(
                         encoder,
-                        "env");
-                    flb_log_event_encoder_body_begin_array(encoder);
-                    for(size_t i = 0; i < event.su->env_count; i++) {
-                    flb_log_event_encoder_append_body_string(
-                        encoder,
-                        event.su->env[i].data,
-                        event.su->env[i].length);
+                        FLB_LOG_EVENT_CSTRING_VALUE("to_username"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.su->to_username.data, event.su->to_username.length));
+                    if(event.su->success) {
+                        flb_log_event_encoder_append_body_values(
+                            encoder,
+                            FLB_LOG_EVENT_CSTRING_VALUE("shell"),
+                            FLB_LOG_EVENT_STRING_VALUE(event.su->shell.data, event.su->shell.length));
+                        flb_log_event_encoder_append_body_cstring(
+                            encoder,
+                            "argv");
+                        flb_log_event_encoder_body_begin_array(encoder);
+                        for(size_t i = 0; i < event.su->argc; i++) {
+                        flb_log_event_encoder_append_body_string(
+                            encoder,
+                            event.su->argv[i].data,
+                            event.su->argv[i].length);
+                        }
+                        flb_log_event_encoder_body_commit_array(encoder);
+                        flb_log_event_encoder_append_body_cstring(
+                            encoder,
+                            "env");
+                        flb_log_event_encoder_body_begin_array(encoder);
+                        for(size_t i = 0; i < event.su->env_count; i++) {
+                        flb_log_event_encoder_append_body_string(
+                            encoder,
+                            event.su->env[i].data,
+                            event.su->env[i].length);
+                        }
+                        flb_log_event_encoder_body_commit_array(encoder);
                     }
-                    flb_log_event_encoder_body_commit_array(encoder);
+                    flb_log_event_encoder_body_commit_map(encoder);
                 }
-                flb_log_event_encoder_body_commit_map(encoder);
                 break;
             case ES_EVENT_TYPE_NOTIFY_SUDO: {
                 es_event_sudo_t *sudo = event.sudo;
+                if (!sudo) break;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
                     encoder,
@@ -1685,6 +1714,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
             }
             case ES_EVENT_TYPE_NOTIFY_OD_DELETE_USER: {
                 es_event_od_delete_user_t *od_delete_user = event.od_delete_user;
+                if (!od_delete_user) break;
                 flb_log_event_encoder_body_begin_map(encoder);
                 if (od_delete_user->instigator) {
                   flb_log_event_encoder_append_body_cstring(
@@ -1719,6 +1749,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
             }
             case ES_EVENT_TYPE_NOTIFY_OD_CREATE_USER: {
                 es_event_od_create_user_t *od_create_user = event.od_create_user;
+                if (!od_create_user) break;
                 flb_log_event_encoder_body_begin_map(encoder);
                 if (od_create_user->instigator) {
                   flb_log_event_encoder_append_body_cstring(
@@ -1753,6 +1784,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
             }
             case ES_EVENT_TYPE_NOTIFY_OD_CREATE_GROUP: {
                 es_event_od_create_group_t *od_create_group = event.od_create_group;
+                if (!od_create_group) break;
                 flb_log_event_encoder_body_begin_map(encoder);
                 if (od_create_group->instigator) {
                   flb_log_event_encoder_append_body_cstring(
@@ -1787,6 +1819,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
             }
             case ES_EVENT_TYPE_NOTIFY_OD_DELETE_GROUP: {
                 es_event_od_delete_group_t *od_delete_group = event.od_delete_group;
+                if (!od_delete_group) break;
                 flb_log_event_encoder_body_begin_map(encoder);
                 if (od_delete_group->instigator) {
                   flb_log_event_encoder_append_body_cstring(
@@ -1821,6 +1854,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
             }
             case ES_EVENT_TYPE_NOTIFY_OD_MODIFY_PASSWORD: {
                 es_event_od_modify_password_t *od_modify_password = event.od_modify_password;
+                if (!od_modify_password) break;
                 flb_log_event_encoder_body_begin_map(encoder);
                 if (od_modify_password->instigator) {
                   flb_log_event_encoder_append_body_cstring(
@@ -1861,6 +1895,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
             }
             case ES_EVENT_TYPE_NOTIFY_OD_DISABLE_USER: {
                 es_event_od_disable_user_t *od_disable_user = event.od_disable_user;
+                if (!od_disable_user) break;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
@@ -1899,6 +1934,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
             }
             case ES_EVENT_TYPE_NOTIFY_OD_ENABLE_USER: {
                 es_event_od_enable_user_t *od_enable_user = event.od_enable_user;
+                if (!od_enable_user) break;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
@@ -1937,6 +1973,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
             }
             case ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_VALUE_ADD: {
                 es_event_od_attribute_value_add_t *od_attribute_value_add = event.od_attribute_value_add;
+                if (!od_attribute_value_add) break;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
@@ -1987,6 +2024,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
             }
             case ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_VALUE_REMOVE: {
                 es_event_od_attribute_value_remove_t *od_attribute_value_remove = event.od_attribute_value_remove;
+                if (!od_attribute_value_remove) break;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
@@ -2037,6 +2075,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
             }
             case ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_SET: {
                 es_event_od_attribute_set_t *od_attribute_set = event.od_attribute_set;
+                if (!od_attribute_set) break;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
@@ -2097,6 +2136,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
             }
             case ES_EVENT_TYPE_NOTIFY_OD_GROUP_ADD: {
                 es_event_od_group_add_t *od_group_add = event.od_group_add;
+                if (!od_group_add) break;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
@@ -2157,6 +2197,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
             }
             case ES_EVENT_TYPE_NOTIFY_OD_GROUP_REMOVE: {
                 es_event_od_group_remove_t *od_group_remove = event.od_group_remove;
+                if (!od_group_remove) break;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
@@ -2217,6 +2258,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
             }
             case ES_EVENT_TYPE_NOTIFY_OD_GROUP_SET: {
                 es_event_od_group_set_t *od_group_set = event.od_group_set;
+                if (!od_group_set) break;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
@@ -2283,6 +2325,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
             }
             case ES_EVENT_TYPE_NOTIFY_AUTHENTICATION: {
                 es_event_authentication_t *authentication = event.authentication;
+                if (!authentication) break;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
                     encoder,
