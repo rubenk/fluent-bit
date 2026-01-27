@@ -19,6 +19,7 @@
 
 #include <fluent-bit/flb_input_plugin.h>
 #include <fluent-bit/flb_log_event_encoder.h>
+#include <fluent-bit/flb_slist.h>
 
 #include <EndpointSecurity/EndpointSecurity.h>
 #include <bsm/libbsm.h>
@@ -389,10 +390,13 @@ static int encode_es_process_t(struct flb_log_event_encoder *encoder, const es_p
  */
 static int parse_event_types_config(struct flb_maces_config *ctx,
                                      struct flb_input_instance *ins) {
-    char *str, *token, *saveptr;
+    struct mk_list event_list;
+    struct mk_list *head;
+    struct flb_slist_entry *entry;
     es_event_type_t event_type;
     size_t count = 0;
     size_t capacity = 16;
+    int ret;
 
     if (!ctx->event_types_str) {
         /* No configuration, use defaults */
@@ -408,52 +412,48 @@ static int parse_event_types_config(struct flb_maces_config *ctx,
         return 0;
     }
 
+    /* Split comma-separated string into list */
+    mk_list_init(&event_list);
+    ret = flb_slist_split_string(&event_list, ctx->event_types_str, ',', -1);
+    if (ret == -1 || ret == 0) {
+        flb_plg_error(ins, "Failed to parse event_types configuration");
+        return -1;
+    }
+
     /* Allocate initial array */
     ctx->events = flb_malloc(sizeof(es_event_type_t) * capacity);
     if (!ctx->events) {
+        flb_slist_destroy(&event_list);
         return -1;
     }
 
-    /* Duplicate string for tokenization */
-    str = flb_strdup(ctx->event_types_str);
-    if (!str) {
-        flb_free(ctx->events);
-        ctx->events = NULL;
-        return -1;
-    }
+    /* Parse each event type name */
+    mk_list_foreach(head, &event_list) {
+        entry = mk_list_entry(head, struct flb_slist_entry, _head);
 
-    /* Parse comma-separated values */
-    token = strtok_r(str, ",", &saveptr);
-    while (token != NULL) {
-        /* Trim whitespace */
-        while (*token == ' ' || *token == '\t') token++;
-        char *end = token + strlen(token) - 1;
-        while (end > token && (*end == ' ' || *end == '\t')) *end-- = '\0';
-
-        if (event_type_from_str(token, &event_type) == 0) {
+        /* flb_slist automatically trims whitespace */
+        if (event_type_from_str(entry->str, &event_type) == 0) {
             /* Expand array if needed */
             if (count >= capacity) {
                 capacity *= 2;
                 es_event_type_t *new_events = flb_realloc(ctx->events,
                                                            sizeof(es_event_type_t) * capacity);
                 if (!new_events) {
-                    flb_free(str);
                     flb_free(ctx->events);
                     ctx->events = NULL;
+                    flb_slist_destroy(&event_list);
                     return -1;
                 }
                 ctx->events = new_events;
             }
             ctx->events[count++] = event_type;
-            flb_plg_debug(ins, "Subscribed to event type: %s", token);
+            flb_plg_debug(ins, "Subscribed to event type: %s", entry->str);
         } else {
-            flb_plg_warn(ins, "Unknown event type: %s (skipping)", token);
+            flb_plg_warn(ins, "Unknown event type: %s (skipping)", entry->str);
         }
-
-        token = strtok_r(NULL, ",", &saveptr);
     }
 
-    flb_free(str);
+    flb_slist_destroy(&event_list);
 
     if (count == 0) {
         flb_plg_error(ins, "No valid event types configured");
