@@ -2365,6 +2365,8 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
     es_return_t subscribed = es_subscribe(ctx->client, events, sizeof events / sizeof *events);
     if(subscribed != ES_RETURN_SUCCESS) {
         flb_plg_error(ins, "Error subscribing to events");
+        es_delete_client(ctx->client);
+        flb_log_event_encoder_destroy(ctx->encoder);
         flb_free(ctx);
         return -1;
     } else {
