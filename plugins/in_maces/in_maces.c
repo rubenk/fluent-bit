@@ -25,6 +25,7 @@
 #include <sys/types.h>
 #include <sys/acl.h>
 #include <uuid/uuid.h>
+#include <pthread.h>
 
 #include "events.h"
 
@@ -32,6 +33,7 @@ struct flb_maces_config {
     es_client_t *client;
     struct flb_input_instance *ins;
     struct flb_log_event_encoder *encoder;
+    pthread_mutex_t encoder_mutex;
 };
 
 
@@ -391,12 +393,20 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
         return -1;
     }
 
+    if (pthread_mutex_init(&ctx->encoder_mutex, NULL) != 0) {
+        flb_plg_error(ins, "could not initialize encoder mutex");
+        flb_log_event_encoder_destroy(ctx->encoder);
+        flb_free(ctx);
+        return -1;
+    }
+
     ctx->ins = ins;
 
     flb_input_set_context(ins, ctx);
 
     // This block is called by Endpoint Security for each event
     es_handler_block_t handler = ^(es_client_t *c, const es_message_t *msg ) {
+        pthread_mutex_lock(&ctx->encoder_mutex);
         struct flb_log_event_encoder *encoder = ctx->encoder;
         es_events_t event = msg->event;
 
@@ -2350,6 +2360,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
             encoder->output_buffer,
             encoder->output_length);
         flb_log_event_encoder_reset(encoder);
+        pthread_mutex_unlock(&ctx->encoder_mutex);
     };
 
     es_new_client_result_t res = es_new_client(&ctx->client, handler);
@@ -2370,6 +2381,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 break;
               // TODO: handle all documented errors in the enum
         }
+        pthread_mutex_destroy(&ctx->encoder_mutex);
         flb_log_event_encoder_destroy(ctx->encoder);
         flb_free(ctx);
         return -1;
@@ -2381,6 +2393,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
     if(subscribed != ES_RETURN_SUCCESS) {
         flb_plg_error(ins, "Error subscribing to events");
         es_delete_client(ctx->client);
+        pthread_mutex_destroy(&ctx->encoder_mutex);
         flb_log_event_encoder_destroy(ctx->encoder);
         flb_free(ctx);
         return -1;
@@ -2407,6 +2420,8 @@ static int in_maces_exit(void *data, struct flb_config *config)
     if (ctx->encoder) {
         flb_log_event_encoder_destroy(ctx->encoder);
     }
+
+    pthread_mutex_destroy(&ctx->encoder_mutex);
 
     flb_free(ctx);
     return 0;
