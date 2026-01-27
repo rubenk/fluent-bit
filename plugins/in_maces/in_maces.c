@@ -728,6 +728,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     encoder,
                     "target");
                 encode_es_file_t(encoder, event.listextattr.target);
+                flb_log_event_encoder_body_commit_map(encoder);
                 break;
             case ES_EVENT_TYPE_NOTIFY_SETEXTATTR:
                 flb_log_event_encoder_body_begin_map(encoder);
