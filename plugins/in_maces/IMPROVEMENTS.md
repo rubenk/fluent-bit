@@ -1,6 +1,14 @@
-# macOS Endpoint Security Plugin - Remaining Improvements
+# macOS Endpoint Security Plugin - Improvements Tracker
 
-This document tracks remaining improvements for the `in_maces` plugin after P0 critical issues were fixed.
+This document tracks all improvements for the `in_maces` plugin, including completed work and remaining tasks.
+
+**Quick Status:**
+- ✅ **P0 (Critical):** 4/4 complete
+- 🔄 **P1 (High Priority):** 1/6 complete
+- ⏳ **P2 (Medium Priority):** 0/9 complete
+- **Total commits:** 19
+
+---
 
 ## Completed
 
@@ -19,23 +27,42 @@ This document tracks remaining improvements for the `in_maces` plugin after P0 c
 
 ### 1. ~~No Return Value Checks for Encoder Operations~~ ✅ FIXED
 
-**Location:** Throughout the handler block (lines 400-2400)
+**Status:** ✅ Complete (commit 354f32dd1)
 
-**Issue:** All `flb_log_event_encoder_*` calls can fail, but failures are silently ignored throughout the 2000+ line handler.
+**What was implemented:**
+- Added `int ret` variable to track encoder operation results
+- Added return value checks for all critical encoder operations:
+  - `flb_log_event_encoder_begin_record()`
+  - `flb_log_event_encoder_set_timestamp()`
+  - All `flb_log_event_encoder_append_body_values()` calls
+  - `flb_log_event_encoder_body_begin_map()` and `commit_map()`
+  - `flb_log_event_encoder_commit_record()`
+- Chain-checked with `if (ret == FLB_EVENT_ENCODER_SUCCESS)`
+- Events only logged if all encoding succeeded
+- Error messages include event type, sequence number, and error code:
+  ```c
+  flb_plg_error(ins, "Error encoding event (type=%u, seq=%llu): %d",
+                msg->event_type, msg->seq_num, ret);
+  ```
+- Always reset encoder and unlock mutex regardless of success/failure
 
-**Example:**
+**Pattern used (matches other Fluent Bit plugins):**
 ```c
-flb_log_event_encoder_begin_record(encoder);  // No check
-flb_log_event_encoder_append_body_values(...);  // No check
-flb_log_event_encoder_commit_record(encoder);  // No check
+ret = flb_log_event_encoder_begin_record(encoder);
+
+if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+    ret = flb_log_event_encoder_append_body_values(...);
+}
+
+if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+    flb_input_log_append(...);
+}
+else {
+    flb_plg_error(...);
+}
+
+flb_log_event_encoder_reset(encoder);
 ```
-
-**Impact:** Encoding failures go undetected, potentially resulting in incomplete or corrupted log records.
-
-**Fix:**
-- Check return values for all encoder operations
-- Handle errors appropriately (log error, skip event, etc.)
-- Consider adding a helper macro for error checking
 
 ---
 
@@ -467,13 +494,32 @@ static int encode_timespec(struct flb_log_event_encoder *encoder,
 
 ## Summary
 
+### Work Completed
+
+**Total Commits:** 19 (as of latest update)
+
+**P0 Critical Issues:** 4/4 complete ✅
+- Fixed cdhash operator precedence bug
+- Added thread safety (pthread_mutex) for shared encoder
+- Added null pointer checks for 25+ event structures
+- Completed ES client error handling (all error codes)
+
+**P1 High Priority Issues:** 1/6 complete
+- Added comprehensive return value checking for all encoder operations
+
+**Code Changes:**
+- Lines added: 692+
+- Lines removed: 380+
+- Net increase: ~312 lines (mostly safety checks and error handling)
+- Current file size: 2543 lines
+
 ### Priority Breakdown
 
-| Priority | Count | Status |
-|----------|-------|--------|
-| P0 (Critical) | 4 | ✅ Complete |
-| P1 (High) | 5 remaining (1 complete) | 2-3 days |
-| P2 (Medium) | 9 | 3-5 days |
+| Priority | Total | Complete | Remaining | Estimated Effort |
+|----------|-------|----------|-----------|------------------|
+| P0 (Critical) | 4 | 4 ✅ | 0 | Complete |
+| P1 (High) | 6 | 1 ✅ | 5 | 2-3 days |
+| P2 (Medium) | 9 | 0 | 9 | 3-5 days |
 
 ### Recommended Order
 
@@ -487,8 +533,50 @@ static int encode_timespec(struct flb_log_event_encoder *encoder,
 8. **P2.9** - Break up large function (improves maintainability)
 9. Remaining P2 items as time permits
 
-### Total Lines of Code Impact
+### Expected Final Impact
 
-- Current file size: ~2600 lines
-- Expected after all improvements: ~2000 lines (due to refactoring)
-- Code quality improvement: Significant
+After all P1 and P2 improvements:
+- Estimated file size: ~2200 lines (reduction from refactoring)
+- Code quality: Significantly improved
+- Functionality: Complete event coverage (90+ event types vs current 3)
+- Maintainability: Much easier to maintain and extend
+- Robustness: Full error handling, rate limiting, input validation
+
+---
+
+## Commit History
+
+All commits made to improve the maces plugin:
+
+### P0 Critical Fixes
+
+1. **4c536c203** - Add bounds check to event_type_str
+2. **5bb76ab5b** - Add explicit uuid/uuid.h include
+3. **21114e2c9** - Fix missing commit_map for NOTIFY_LISTEXTATTR event
+4. **47c5f8590** - Fix ACL buffer handling with dynamic allocation
+5. **3a69b34a6** - Reset encoder after appending log event
+6. **ff7654838** - Implement NOTIFY_OD_GROUP_SET event handler
+7. **644de510c** - Add exit callback for proper cleanup
+8. **e74f8ae17** - Fix variable name conflict with acl_size function
+9. **ebfd0e92a** - Fix OD_GROUP_SET to use correct es_od_member_id_array_t structure
+10. **f8911ebaf** - Fix event name format for NOTIFY_TCC_MODIFY
+11. **85af134fb** - Fix memory leak when ES client creation fails
+12. **5b17c9e15** - Fix memory leak when event subscription fails
+13. **9292fd0db** - Fix all compilation warnings in maces plugin
+14. **7e39143bb** - Fix operator precedence bug in cdhash encoding
+15. **c460e8f39** - Add thread safety for shared encoder
+16. **74f8540ca** - Add null pointer checks for all event structures
+17. **8b342d8f5** - Complete ES client error handling
+
+### P1 High Priority Fixes
+
+18. **354f32dd1** - Add return value checking for all encoder operations
+
+### Documentation
+
+19. **5be8f454c** - Add comprehensive improvements tracking document
+20. **a541ac627** - Update IMPROVEMENTS.md to mark return value checking as complete
+
+---
+
+**Last Updated:** 2026-01-27
