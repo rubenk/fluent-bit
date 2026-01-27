@@ -2269,6 +2269,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
         flb_input_log_append(ins, NULL, 0,
             encoder->output_buffer,
             encoder->output_length);
+        flb_log_event_encoder_reset(encoder);
     };
 
     es_new_client_result_t res = es_new_client(&ctx->client, handler);
