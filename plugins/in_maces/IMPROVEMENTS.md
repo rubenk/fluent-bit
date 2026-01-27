@@ -4,9 +4,9 @@ This document tracks all improvements for the `in_maces` plugin, including compl
 
 **Quick Status:**
 - ✅ **P0 (Critical):** 4/4 complete
-- 🔄 **P1 (High Priority):** 1/6 complete
+- 🔄 **P1 (High Priority):** 4/5 complete (1 won't fix)
 - ⏳ **P2 (Medium Priority):** 0/9 complete
-- **Total commits:** 19
+- **Total commits:** 25
 
 ---
 
@@ -20,6 +20,9 @@ This document tracks all improvements for the `in_maces` plugin, including compl
 
 ### P1 (High Priority)
 - ✅ Added return value checks for all encoder operations
+- ✅ Made event types configurable (lowercase names, NOTIFY_-only)
+- ✅ Fixed cleanup on subscription failure
+- ❌ Won't fix: Input validation (ES framework is trusted)
 
 ---
 
@@ -66,81 +69,42 @@ flb_log_event_encoder_reset(encoder);
 
 ---
 
-### 2. Only 3 Event Types Subscribed
+### 2. ~~Only 3 Event Types Subscribed~~ ✅ FIXED
 
-**Location:** Line ~2390
+**Status:** ✅ Complete (commits 05aaaae40 and related)
 
-**Issue:** The plugin has encoding logic for 90+ event types but only subscribes to 3:
-
-```c
-es_event_type_t events[] = {
-    ES_EVENT_TYPE_NOTIFY_EXEC,
-    ES_EVENT_TYPE_NOTIFY_FORK,
-    ES_EVENT_TYPE_NOTIFY_EXIT
-};
-```
-
-**Impact:** Massive gap in functionality - most event handlers are never invoked.
-
-**Fix:** Either:
-- Make event types configurable via plugin config
-- Subscribe to all supported events by default
-- Document why only these 3 are enabled
+**What was implemented:**
+- Made event types configurable via plugin config
+- Added `event_types` configuration option
+- Users can specify comma-separated event names (e.g., "exec,fork,authentication")
+- Lowercase names without NOTIFY_ prefix for user-friendly config
+- Only NOTIFY_ events allowed (AUTH_ events excluded)
+- Single source of truth in events.c
+- Used Fluent Bit's flb_slist API for parsing
+- Default: "exec,fork,exit"
 
 ---
 
-### 3. No Configuration Options
+### 3. ~~No Configuration Options~~ ✅ FIXED
 
-**Location:** Plugin definition (end of file)
+**Status:** ✅ Complete (part of P1.2 implementation)
 
-**Issue:** The plugin has no `config_map` defined. Users cannot:
-- Filter which event types to subscribe to
-- Configure buffer sizes
-- Enable/disable features
-- Set rate limits
-- Exclude certain processes
-
-**Impact:** Plugin is inflexible and cannot be customized.
-
-**Fix:** Add a `config_map` array with options like:
-```c
-struct flb_config_map config_map[] = {
-    {
-     FLB_CONFIG_MAP_STR, "event_types", NULL,
-     0, FLB_TRUE, offsetof(struct flb_maces_config, event_types),
-     "Comma-separated list of event types to subscribe"
-    },
-    {
-     FLB_CONFIG_MAP_BOOL, "include_process_tree", "true",
-     0, FLB_TRUE, offsetof(struct flb_maces_config, include_process_tree),
-     "Include full process tree in events"
-    },
-    {0}
-};
-```
+**What was implemented:**
+- Added `config_map` with event_types option
+- Configurable event subscription via comma-separated list
+- Dynamic event array allocation
+- Proper cleanup in all error paths
 
 ---
 
-### 4. No Cleanup on Subscription Failure
+### 4. ~~No Cleanup on Subscription Failure~~ ✅ FIXED
 
-**Location:** Lines ~2437-2441
+**Status:** ✅ Complete (commit 6e81db2be)
 
-**Issue:** When `es_subscribe` fails, `es_unsubscribe_all` is not called before cleanup:
-
-```c
-if(subscribed != ES_RETURN_SUCCESS) {
-    flb_plg_error(ins, "Error subscribing to events");
-    es_delete_client(ctx->client);  // Should call es_unsubscribe_all first
-    pthread_mutex_destroy(&ctx->encoder_mutex);
-    flb_log_event_encoder_destroy(ctx->encoder);
-    flb_free(ctx);
-    return -1;
-}
-```
-
-**Impact:** Potential resource leak if partial subscription occurred.
-
-**Fix:** Call `es_unsubscribe_all(ctx->client)` before `es_delete_client(ctx->client)`.
+**What was implemented:**
+- Added `es_unsubscribe_all(ctx->client)` before `es_delete_client(ctx->client)`
+- Ensures proper cleanup of partial subscriptions on failure
+- Prevents resource leaks when subscription fails
 
 ---
 
@@ -163,32 +127,15 @@ if(subscribed != ES_RETURN_SUCCESS) {
 
 ---
 
-### 6. No Input Validation from ES Framework
+### 6. ~~No Input Validation from ES Framework~~ ❌ WON'T FIX
 
-**Location:** Throughout handler block
+**Status:** ❌ Won't Fix - ES framework is trusted
 
-**Issue:** The plugin trusts all data from the Endpoint Security framework without validation:
-- No length limits on strings (could cause excessive memory usage)
-- No validation of enum values (could be out of range)
-- No sanity checks on numerical values
-
-**Impact:** If the ES framework is compromised or buggy, could lead to crashes or exploitation.
-
-**Fix:** Add defensive validation:
-```c
-// String length validation
-#define MAX_STRING_LENGTH 65536
-if (string_token.length > MAX_STRING_LENGTH) {
-    flb_plg_warn(ins, "String length %zu exceeds maximum, truncating", string_token.length);
-    string_token.length = MAX_STRING_LENGTH;
-}
-
-// Enum validation
-if (event_type >= ES_EVENT_TYPE_LAST) {
-    flb_plg_error(ins, "Invalid event type %d", event_type);
-    return;
-}
-```
+**Rationale:**
+- The Endpoint Security framework is a core macOS security component
+- The system itself relies on ES - if ES is compromised, there are much bigger problems
+- Adding validation would add unnecessary overhead for minimal security benefit
+- ES framework data is considered trustworthy
 
 ---
 
@@ -515,20 +462,20 @@ static int encode_timespec(struct flb_log_event_encoder *encoder,
 
 ### Priority Breakdown
 
-| Priority | Total | Complete | Remaining | Estimated Effort |
-|----------|-------|----------|-----------|------------------|
-| P0 (Critical) | 4 | 4 ✅ | 0 | Complete |
-| P1 (High) | 6 | 1 ✅ | 5 | 2-3 days |
-| P2 (Medium) | 9 | 0 | 9 | 3-5 days |
+| Priority | Total | Complete | Won't Fix | Remaining | Status |
+|----------|-------|----------|-----------|-----------|--------|
+| P0 (Critical) | 4 | 4 ✅ | 0 | 0 | Complete |
+| P1 (High) | 6 | 4 ✅ | 1 ❌ | 1 | Nearly done |
+| P2 (Medium) | 9 | 0 | 0 | 9 | Not started |
 
 ### Recommended Order
 
 1. ~~**P1.1** - Add return value checks~~ ✅ **COMPLETE**
-2. **P1.2** - Expand event subscription (quick win, unlocks functionality)
-3. **P1.3** - Add configuration options (enables customization)
-4. **P1.4** - Fix subscription cleanup (simple fix)
+2. ~~**P1.2** - Expand event subscription~~ ✅ **COMPLETE**
+3. ~~**P1.3** - Add configuration options~~ ✅ **COMPLETE**
+4. ~~**P1.4** - Fix subscription cleanup~~ ✅ **COMPLETE**
 5. **P1.5** - Add rate limiting (prevents resource exhaustion)
-6. **P1.6** - Add input validation (improves security)
+6. ~~**P1.6** - Add input validation~~ ❌ **WON'T FIX** (ES framework is trusted)
 7. **P2.7** - Refactor OD events (reduces maintenance burden)
 8. **P2.9** - Break up large function (improves maintainability)
 9. Remaining P2 items as time permits
@@ -571,11 +518,16 @@ All commits made to improve the maces plugin:
 ### P1 High Priority Fixes
 
 18. **354f32dd1** - Add return value checking for all encoder operations
+19. **[commit]** - Make event types configurable via plugin config
+20. **[commit]** - Refactor to eliminate event name duplication
+21. **[commit]** - Use lowercase event names and only allow NOTIFY_ events
+22. **05aaaae40** - Use Fluent Bit's flb_slist API for string splitting
+23. **6e81db2be** - Fix cleanup on subscription failure
 
 ### Documentation
 
-19. **5be8f454c** - Add comprehensive improvements tracking document
-20. **a541ac627** - Update IMPROVEMENTS.md to mark return value checking as complete
+24. **5be8f454c** - Add comprehensive improvements tracking document
+25. **a541ac627** - Update IMPROVEMENTS.md to mark return value checking as complete
 
 ---
 
