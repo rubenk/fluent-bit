@@ -2355,6 +2355,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 break;
               // TODO: handle all documented errors in the enum
         }
+        flb_log_event_encoder_destroy(ctx->encoder);
         flb_free(ctx);
         return -1;
     }
