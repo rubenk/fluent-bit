@@ -187,7 +187,7 @@ const char *event_type_str(const es_event_type_t event_type) {
         "NOTIFY_GATEKEEPER_USER_OVERRIDE",
 
         // The following events are available beginning in macOS 15.4
-        "ES_EVENT_TYPE_NOTIFY_TCC_MODIFY"
+        "NOTIFY_TCC_MODIFY"
     };
 
   if (event_type >= sizeof(names) / sizeof(names[0])) {
