@@ -19,6 +19,12 @@
 
 #include <EndpointSecurity/EndpointSecurity.h>
 
+/* Convert event type enum to string name */
 const char *event_type_str(const es_event_type_t event_type);
+
+/* Parse event type string name to enum value
+ * Returns 0 on success, -1 if name is not recognized
+ */
+int event_type_from_str(const char *name, es_event_type_t *out);
 
 

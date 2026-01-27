@@ -34,6 +34,11 @@ struct flb_maces_config {
     struct flb_input_instance *ins;
     struct flb_log_event_encoder *encoder;
     pthread_mutex_t encoder_mutex;
+
+    /* Configuration */
+    char *event_types_str;        /* Comma-separated event type names from config */
+    es_event_type_t *events;      /* Parsed array of event types to subscribe */
+    size_t events_count;          /* Number of event types in the array */
 };
 
 
@@ -379,6 +384,90 @@ static int encode_es_process_t(struct flb_log_event_encoder *encoder, const es_p
     return 0;
 }
 
+/* Parse comma-separated event types configuration string
+ * Returns 0 on success, -1 on error
+ */
+static int parse_event_types_config(struct flb_maces_config *ctx,
+                                     struct flb_input_instance *ins) {
+    char *str, *token, *saveptr;
+    es_event_type_t event_type;
+    size_t count = 0;
+    size_t capacity = 16;
+
+    if (!ctx->event_types_str) {
+        /* No configuration, use defaults */
+        ctx->events_count = 3;
+        ctx->events = flb_malloc(sizeof(es_event_type_t) * ctx->events_count);
+        if (!ctx->events) {
+            return -1;
+        }
+        ctx->events[0] = ES_EVENT_TYPE_NOTIFY_EXEC;
+        ctx->events[1] = ES_EVENT_TYPE_NOTIFY_FORK;
+        ctx->events[2] = ES_EVENT_TYPE_NOTIFY_EXIT;
+        flb_plg_info(ins, "Using default event types: EXEC, FORK, EXIT");
+        return 0;
+    }
+
+    /* Allocate initial array */
+    ctx->events = flb_malloc(sizeof(es_event_type_t) * capacity);
+    if (!ctx->events) {
+        return -1;
+    }
+
+    /* Duplicate string for tokenization */
+    str = flb_strdup(ctx->event_types_str);
+    if (!str) {
+        flb_free(ctx->events);
+        ctx->events = NULL;
+        return -1;
+    }
+
+    /* Parse comma-separated values */
+    token = strtok_r(str, ",", &saveptr);
+    while (token != NULL) {
+        /* Trim whitespace */
+        while (*token == ' ' || *token == '\t') token++;
+        char *end = token + strlen(token) - 1;
+        while (end > token && (*end == ' ' || *end == '\t')) *end-- = '\0';
+
+        if (event_type_from_str(token, &event_type) == 0) {
+            /* Expand array if needed */
+            if (count >= capacity) {
+                capacity *= 2;
+                es_event_type_t *new_events = flb_realloc(ctx->events,
+                                                           sizeof(es_event_type_t) * capacity);
+                if (!new_events) {
+                    flb_free(str);
+                    flb_free(ctx->events);
+                    ctx->events = NULL;
+                    return -1;
+                }
+                ctx->events = new_events;
+            }
+            ctx->events[count++] = event_type;
+            flb_plg_debug(ins, "Subscribed to event type: %s", token);
+        } else {
+            flb_plg_warn(ins, "Unknown event type: %s (skipping)", token);
+        }
+
+        token = strtok_r(NULL, ",", &saveptr);
+    }
+
+    flb_free(str);
+
+    if (count == 0) {
+        flb_plg_error(ins, "No valid event types configured");
+        flb_free(ctx->events);
+        ctx->events = NULL;
+        return -1;
+    }
+
+    ctx->events_count = count;
+    flb_plg_info(ins, "Subscribed to %zu event types", count);
+
+    return 0;
+}
+
 static int in_maces_init(struct flb_input_instance *ins, struct flb_config *config, void *data) {
     struct flb_maces_config *ctx = flb_calloc(1, sizeof(struct flb_maces_config));
     if (!ctx) {
@@ -403,6 +492,15 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
     ctx->ins = ins;
 
     flb_input_set_context(ins, ctx);
+
+    /* Parse event types configuration */
+    if (parse_event_types_config(ctx, ins) != 0) {
+        flb_plg_error(ins, "Failed to parse event types configuration");
+        pthread_mutex_destroy(&ctx->encoder_mutex);
+        flb_log_event_encoder_destroy(ctx->encoder);
+        flb_free(ctx);
+        return -1;
+    }
 
     // This block is called by Endpoint Security for each event
     es_handler_block_t handler = ^(es_client_t *c, const es_message_t *msg ) {
@@ -2490,18 +2588,23 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
         }
         pthread_mutex_destroy(&ctx->encoder_mutex);
         flb_log_event_encoder_destroy(ctx->encoder);
+        if (ctx->events) {
+            flb_free(ctx->events);
+        }
         flb_free(ctx);
         return -1;
     }
 
     flb_plg_info(ins, "Endpoint Security Client initialized successfully");
-    es_event_type_t events[] = {ES_EVENT_TYPE_NOTIFY_EXEC, ES_EVENT_TYPE_NOTIFY_FORK, ES_EVENT_TYPE_NOTIFY_EXIT};
-    es_return_t subscribed = es_subscribe(ctx->client, events, sizeof events / sizeof *events);
+    es_return_t subscribed = es_subscribe(ctx->client, ctx->events, ctx->events_count);
     if(subscribed != ES_RETURN_SUCCESS) {
         flb_plg_error(ins, "Error subscribing to events");
         es_delete_client(ctx->client);
         pthread_mutex_destroy(&ctx->encoder_mutex);
         flb_log_event_encoder_destroy(ctx->encoder);
+        if (ctx->events) {
+            flb_free(ctx->events);
+        }
         flb_free(ctx);
         return -1;
     } else {
@@ -2530,9 +2633,36 @@ static int in_maces_exit(void *data, struct flb_config *config)
 
     pthread_mutex_destroy(&ctx->encoder_mutex);
 
+    if (ctx->events) {
+        flb_free(ctx->events);
+    }
+
     flb_free(ctx);
     return 0;
 }
+
+/* Configuration map */
+static struct flb_config_map config_map[] = {
+    {
+     FLB_CONFIG_MAP_STR, "event_types", NULL,
+     0, FLB_FALSE, offsetof(struct flb_maces_config, event_types_str),
+     "Comma-separated list of event types to subscribe. "
+     "Examples: EXEC,FORK,EXIT or AUTHENTICATION,SUDO,SU. "
+     "Default: EXEC,FORK,EXIT. "
+     "Available types: EXEC, FORK, EXIT, CLOSE, CREATE, EXCHANGEDATA, KEXTLOAD, "
+     "KEXTUNLOAD, LINK, MMAP, MPROTECT, MOUNT, UNMOUNT, IOKIT_OPEN, RENAME, "
+     "SETATTRLIST, SETEXTATTR, SETFLAGS, SETMODE, SETOWNER, SIGNAL, UNLINK, WRITE, "
+     "AUTHENTICATION, XP_MALWARE_DETECTED, XP_MALWARE_REMEDIATED, LW_SESSION_LOGIN, "
+     "LW_SESSION_LOGOUT, LW_SESSION_LOCK, LW_SESSION_UNLOCK, SCREENSHARING_ATTACH, "
+     "SCREENSHARING_DETACH, OPENSSH_LOGIN, OPENSSH_LOGOUT, LOGIN_LOGIN, LOGIN_LOGOUT, "
+     "BTM_LAUNCH_ITEM_ADD, BTM_LAUNCH_ITEM_REMOVE, PROFILE_ADD, PROFILE_REMOVE, SU, "
+     "AUTHORIZATION_PETITION, AUTHORIZATION_JUDGEMENT, SUDO, OD_GROUP_ADD, OD_GROUP_REMOVE, "
+     "OD_GROUP_SET, OD_MODIFY_PASSWORD, OD_DISABLE_USER, OD_ENABLE_USER, "
+     "OD_ATTRIBUTE_VALUE_ADD, OD_ATTRIBUTE_VALUE_REMOVE, OD_ATTRIBUTE_SET, OD_CREATE_USER, "
+     "OD_CREATE_GROUP, OD_DELETE_USER, OD_DELETE_GROUP, XPC_CONNECT"
+    },
+    {0}
+};
 
 /* Plugin registration */
 struct flb_input_plugin in_maces_plugin = {
@@ -2540,4 +2670,5 @@ struct flb_input_plugin in_maces_plugin = {
     .description = "MacOS Endpoint Security input plugin",
     .cb_init     = in_maces_init,
     .cb_exit     = in_maces_exit,
+    .config_map  = config_map,
 };
