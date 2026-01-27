@@ -406,36 +406,58 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
 
     // This block is called by Endpoint Security for each event
     es_handler_block_t handler = ^(es_client_t *c, const es_message_t *msg ) {
+        int ret;
         pthread_mutex_lock(&ctx->encoder_mutex);
         struct flb_log_event_encoder *encoder = ctx->encoder;
         es_events_t event = msg->event;
 
         // encode the generic part of each message
-        flb_log_event_encoder_begin_record(encoder);
-        flb_log_event_encoder_set_timestamp(encoder, &((struct flb_time) { .tm = msg->time}));
-        flb_log_event_encoder_append_body_values(
-            encoder,
-            FLB_LOG_EVENT_CSTRING_VALUE("seq_num"),
-            FLB_LOG_EVENT_UINT64_VALUE(msg->seq_num));
-        flb_log_event_encoder_append_body_values(
-            encoder,
-            FLB_LOG_EVENT_CSTRING_VALUE("version"),
-            FLB_LOG_EVENT_UINT32_VALUE(msg->version));
-        flb_log_event_encoder_append_body_values(
-            encoder,
-            FLB_LOG_EVENT_CSTRING_VALUE("event_type"),
-            FLB_LOG_EVENT_UINT32_VALUE(msg->event_type));
-        flb_log_event_encoder_append_body_cstring(
-            encoder,
-            "event");
+        ret = flb_log_event_encoder_begin_record(encoder);
 
-        flb_log_event_encoder_body_begin_map(encoder);
-        flb_log_event_encoder_append_body_cstring(
-            encoder,
-            (char *)event_type_str(msg->event_type));
+        if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+            ret = flb_log_event_encoder_set_timestamp(encoder, &((struct flb_time) { .tm = msg->time}));
+        }
+
+        if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+            ret = flb_log_event_encoder_append_body_values(
+                encoder,
+                FLB_LOG_EVENT_CSTRING_VALUE("seq_num"),
+                FLB_LOG_EVENT_UINT64_VALUE(msg->seq_num));
+        }
+
+        if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+            ret = flb_log_event_encoder_append_body_values(
+                encoder,
+                FLB_LOG_EVENT_CSTRING_VALUE("version"),
+                FLB_LOG_EVENT_UINT32_VALUE(msg->version));
+        }
+
+        if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+            ret = flb_log_event_encoder_append_body_values(
+                encoder,
+                FLB_LOG_EVENT_CSTRING_VALUE("event_type"),
+                FLB_LOG_EVENT_UINT32_VALUE(msg->event_type));
+        }
+
+        if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+            ret = flb_log_event_encoder_append_body_cstring(
+                encoder,
+                "event");
+        }
+
+        if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+            ret = flb_log_event_encoder_body_begin_map(encoder);
+        }
+
+        if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+            ret = flb_log_event_encoder_append_body_cstring(
+                encoder,
+                (char *)event_type_str(msg->event_type));
+        }
 
         // event specific code
-        switch (msg->event_type) {
+        if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+            switch (msg->event_type) {
             case ES_EVENT_TYPE_NOTIFY_EXEC:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
@@ -2377,31 +2399,65 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
+            }
         }
 
-        flb_log_event_encoder_body_commit_map(encoder);
+        if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+            ret = flb_log_event_encoder_body_commit_map(encoder);
+        }
 
-        flb_log_event_encoder_append_body_cstring(
-            encoder,
-            "process");
-        encode_es_process_t(encoder, msg->process);
-        flb_log_event_encoder_append_body_values(
-            encoder,
-            FLB_LOG_EVENT_CSTRING_VALUE("global_seq_num"),
-            FLB_LOG_EVENT_UINT64_VALUE(msg->global_seq_num));
-        flb_log_event_encoder_append_body_cstring(
-            encoder,
-            "thread");
-        flb_log_event_encoder_body_begin_map(encoder);
-        flb_log_event_encoder_append_body_values(
-            encoder,
-            FLB_LOG_EVENT_CSTRING_VALUE("thread_id"),
-            FLB_LOG_EVENT_UINT64_VALUE(msg->thread->thread_id));
-        flb_log_event_encoder_body_commit_map(encoder);
-        flb_log_event_encoder_commit_record(encoder);
-        flb_input_log_append(ins, NULL, 0,
-            encoder->output_buffer,
-            encoder->output_length);
+        if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+            ret = flb_log_event_encoder_append_body_cstring(
+                encoder,
+                "process");
+        }
+
+        if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+            encode_es_process_t(encoder, msg->process);
+        }
+
+        if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+            ret = flb_log_event_encoder_append_body_values(
+                encoder,
+                FLB_LOG_EVENT_CSTRING_VALUE("global_seq_num"),
+                FLB_LOG_EVENT_UINT64_VALUE(msg->global_seq_num));
+        }
+
+        if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+            ret = flb_log_event_encoder_append_body_cstring(
+                encoder,
+                "thread");
+        }
+
+        if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+            ret = flb_log_event_encoder_body_begin_map(encoder);
+        }
+
+        if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+            ret = flb_log_event_encoder_append_body_values(
+                encoder,
+                FLB_LOG_EVENT_CSTRING_VALUE("thread_id"),
+                FLB_LOG_EVENT_UINT64_VALUE(msg->thread->thread_id));
+        }
+
+        if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+            ret = flb_log_event_encoder_body_commit_map(encoder);
+        }
+
+        if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+            ret = flb_log_event_encoder_commit_record(encoder);
+        }
+
+        if (ret == FLB_EVENT_ENCODER_SUCCESS) {
+            flb_input_log_append(ins, NULL, 0,
+                encoder->output_buffer,
+                encoder->output_length);
+        }
+        else {
+            flb_plg_error(ins, "Error encoding event (type=%u, seq=%llu): %d",
+                          msg->event_type, msg->seq_num, ret);
+        }
+
         flb_log_event_encoder_reset(encoder);
         pthread_mutex_unlock(&ctx->encoder_mutex);
     };
