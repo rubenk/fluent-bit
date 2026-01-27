@@ -2192,6 +2192,69 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_OD_GROUP_SET:
+                es_event_od_group_set_t *od_group_set = event.od_group_set;
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "instigator");
+                if (od_group_set->instigator) {
+                    encode_es_process_t(encoder, od_group_set->instigator);
+                } else {
+                    flb_log_event_encoder_append_body_null(encoder);
+                }
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("error_code"),
+                    FLB_LOG_EVENT_INT32_VALUE(od_group_set->error_code));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("group_name"),
+                    FLB_LOG_EVENT_STRING_VALUE(od_group_set->group_name.data, od_group_set->group_name.length));
+                flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "members");
+                flb_log_event_encoder_body_begin_array(encoder);
+                for (size_t i = 0; i < od_group_set->member_count; i++) {
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("member_type"),
+                        FLB_LOG_EVENT_INT32_VALUE(od_group_set->members[i].member_type));
+                    if (od_group_set->members[i].member_type == ES_OD_MEMBER_TYPE_USER_NAME) {
+                        flb_log_event_encoder_append_body_values(
+                            encoder,
+                            FLB_LOG_EVENT_CSTRING_VALUE("member_value"),
+                            FLB_LOG_EVENT_STRING_VALUE(od_group_set->members[i].member_value.name.data, od_group_set->members[i].member_value.name.length));
+                    } else {
+                        uuid_string_t uuidstr;
+                        uuid_unparse(od_group_set->members[i].member_value.uuid, uuidstr);
+                        flb_log_event_encoder_append_body_values(
+                            encoder,
+                            FLB_LOG_EVENT_CSTRING_VALUE("member_value"),
+                            FLB_LOG_EVENT_CSTRING_VALUE(uuidstr));
+                    }
+                    flb_log_event_encoder_body_commit_map(encoder);
+                }
+                flb_log_event_encoder_body_commit_array(encoder);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
+                    FLB_LOG_EVENT_STRING_VALUE(od_group_set->node_name.data, od_group_set->node_name.length));
+                if (od_group_set->db_path.length > 0) {
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("db_path"),
+                        FLB_LOG_EVENT_STRING_VALUE(od_group_set->db_path.data, od_group_set->db_path.length));
+                }
+                if (msg->version >= 8) {
+                    flb_log_event_encoder_append_body_cstring(
+                        encoder,
+                        "instigator_token");
+                    encode_audit_token_t(encoder, &od_group_set->instigator_token);
+                }
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             case ES_EVENT_TYPE_NOTIFY_AUTHENTICATION:
                 es_event_authentication_t *authentication = event.authentication;
                 flb_log_event_encoder_body_begin_map(encoder);
