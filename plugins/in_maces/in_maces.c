@@ -404,7 +404,7 @@ static int parse_event_types_config(struct flb_maces_config *ctx,
         ctx->events[0] = ES_EVENT_TYPE_NOTIFY_EXEC;
         ctx->events[1] = ES_EVENT_TYPE_NOTIFY_FORK;
         ctx->events[2] = ES_EVENT_TYPE_NOTIFY_EXIT;
-        flb_plg_info(ins, "Using default event types: EXEC, FORK, EXIT");
+        flb_plg_info(ins, "Using default event types: exec, fork, exit");
         return 0;
     }
 
@@ -2646,20 +2646,21 @@ static struct flb_config_map config_map[] = {
     {
      FLB_CONFIG_MAP_STR, "event_types", NULL,
      0, FLB_FALSE, offsetof(struct flb_maces_config, event_types_str),
-     "Comma-separated list of event types to subscribe. "
-     "Examples: EXEC,FORK,EXIT or AUTHENTICATION,SUDO,SU. "
-     "Default: EXEC,FORK,EXIT. "
-     "Available types: EXEC, FORK, EXIT, CLOSE, CREATE, EXCHANGEDATA, KEXTLOAD, "
-     "KEXTUNLOAD, LINK, MMAP, MPROTECT, MOUNT, UNMOUNT, IOKIT_OPEN, RENAME, "
-     "SETATTRLIST, SETEXTATTR, SETFLAGS, SETMODE, SETOWNER, SIGNAL, UNLINK, WRITE, "
-     "AUTHENTICATION, XP_MALWARE_DETECTED, XP_MALWARE_REMEDIATED, LW_SESSION_LOGIN, "
-     "LW_SESSION_LOGOUT, LW_SESSION_LOCK, LW_SESSION_UNLOCK, SCREENSHARING_ATTACH, "
-     "SCREENSHARING_DETACH, OPENSSH_LOGIN, OPENSSH_LOGOUT, LOGIN_LOGIN, LOGIN_LOGOUT, "
-     "BTM_LAUNCH_ITEM_ADD, BTM_LAUNCH_ITEM_REMOVE, PROFILE_ADD, PROFILE_REMOVE, SU, "
-     "AUTHORIZATION_PETITION, AUTHORIZATION_JUDGEMENT, SUDO, OD_GROUP_ADD, OD_GROUP_REMOVE, "
-     "OD_GROUP_SET, OD_MODIFY_PASSWORD, OD_DISABLE_USER, OD_ENABLE_USER, "
-     "OD_ATTRIBUTE_VALUE_ADD, OD_ATTRIBUTE_VALUE_REMOVE, OD_ATTRIBUTE_SET, OD_CREATE_USER, "
-     "OD_CREATE_GROUP, OD_DELETE_USER, OD_DELETE_GROUP, XPC_CONNECT"
+     "Comma-separated list of event types to subscribe (lowercase, without NOTIFY_ prefix). "
+     "Examples: exec,fork,exit or authentication,sudo,su. "
+     "Default: exec,fork,exit. "
+     "Available types: exec, fork, exit, close, create, exchangedata, kextload, "
+     "kextunload, link, mmap, mprotect, mount, unmount, iokit_open, rename, "
+     "setattrlist, setextattr, setflags, setmode, setowner, signal, unlink, write, "
+     "authentication, xp_malware_detected, xp_malware_remediated, lw_session_login, "
+     "lw_session_logout, lw_session_lock, lw_session_unlock, screensharing_attach, "
+     "screensharing_detach, openssh_login, openssh_logout, login_login, login_logout, "
+     "btm_launch_item_add, btm_launch_item_remove, profile_add, profile_remove, su, "
+     "authorization_petition, authorization_judgement, sudo, od_group_add, od_group_remove, "
+     "od_group_set, od_modify_password, od_disable_user, od_enable_user, "
+     "od_attribute_value_add, od_attribute_value_remove, od_attribute_set, od_create_user, "
+     "od_create_group, od_delete_user, od_delete_group, xpc_connect. "
+     "Note: Only NOTIFY_ events are subscribable; AUTH_ events are not supported."
     },
     {0}
 };

@@ -23,7 +23,10 @@
 const char *event_type_str(const es_event_type_t event_type);
 
 /* Parse event type string name to enum value
- * Returns 0 on success, -1 if name is not recognized
+ * Only NOTIFY_ events are subscribable (AUTH_ events are not supported)
+ * Accepts lowercase names without prefix (e.g., "exec", "fork", "authentication")
+ * Also accepts full NOTIFY_ names for backward compatibility (e.g., "NOTIFY_EXEC")
+ * Returns 0 on success, -1 if name not recognized or not a NOTIFY_ event
  */
 int event_type_from_str(const char *name, es_event_type_t *out);
 
