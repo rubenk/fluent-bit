@@ -494,10 +494,10 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     // as the comment in ESMessage.h says, the acl in the message
                     // is not a complete type. We need to convert it to an external representation first,
                     // and back again
-                    ssize_t acl_size = acl_size(event.create.acl);
-                    if (acl_size > 0) {
-                        char *buf = flb_malloc(acl_size);
-                        if (buf && acl_copy_ext(buf, event.create.acl, acl_size) != -1) {
+                    ssize_t acl_buf_size = acl_size(event.create.acl);
+                    if (acl_buf_size > 0) {
+                        char *buf = flb_malloc(acl_buf_size);
+                        if (buf && acl_copy_ext(buf, event.create.acl, acl_buf_size) != -1) {
                             acl_t acl = acl_copy_int(buf);
                             if (acl) {
                                 char *acl_txt = acl_to_text(acl, NULL);
