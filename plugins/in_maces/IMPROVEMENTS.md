@@ -2,18 +2,22 @@
 
 This document tracks remaining improvements for the `in_maces` plugin after P0 critical issues were fixed.
 
-## Completed (P0 - Critical)
+## Completed
 
+### P0 (Critical)
 - ✅ Fixed cdhash operator precedence bug
 - ✅ Added thread safety for shared encoder
 - ✅ Added null pointer checks for all event structures
 - ✅ Completed ES client error handling
 
+### P1 (High Priority)
+- ✅ Added return value checks for all encoder operations
+
 ---
 
 ## P1 (High Priority) Issues
 
-### 1. No Return Value Checks for Encoder Operations
+### 1. ~~No Return Value Checks for Encoder Operations~~ ✅ FIXED
 
 **Location:** Throughout the handler block (lines 400-2400)
 
@@ -465,17 +469,17 @@ static int encode_timespec(struct flb_log_event_encoder *encoder,
 
 ### Priority Breakdown
 
-| Priority | Count | Estimated Effort |
-|----------|-------|------------------|
+| Priority | Count | Status |
+|----------|-------|--------|
 | P0 (Critical) | 4 | ✅ Complete |
-| P1 (High) | 6 | 2-3 days |
+| P1 (High) | 5 remaining (1 complete) | 2-3 days |
 | P2 (Medium) | 9 | 3-5 days |
 
 ### Recommended Order
 
-1. **P1.2** - Expand event subscription (quick win, unlocks functionality)
-2. **P1.3** - Add configuration options (enables customization)
-3. **P1.1** - Add return value checks (improves robustness)
+1. ~~**P1.1** - Add return value checks~~ ✅ **COMPLETE**
+2. **P1.2** - Expand event subscription (quick win, unlocks functionality)
+3. **P1.3** - Add configuration options (enables customization)
 4. **P1.4** - Fix subscription cleanup (simple fix)
 5. **P1.5** - Add rate limiting (prevents resource exhaustion)
 6. **P1.6** - Add input validation (improves security)
