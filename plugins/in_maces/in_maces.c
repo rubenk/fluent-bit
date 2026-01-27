@@ -352,7 +352,7 @@ static int encode_es_process_t(struct flb_log_event_encoder *encoder, const es_p
     static const char hex_digits[] = "0123456789ABCDEF";
     char cdhash[41];
     for (size_t i = 0; i < 20; i++) {
-      cdhash[i * 2] = hex_digits[process->cdhash[i] >> 4 & 0x0F];
+      cdhash[i * 2] = hex_digits[(process->cdhash[i] >> 4) & 0x0F];
       cdhash[i * 2 + 1] = hex_digits[process->cdhash[i] & 0x0F];
     }
     cdhash[40] = '\0';
