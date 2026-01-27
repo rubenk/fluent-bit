@@ -1605,7 +1605,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
-            case ES_EVENT_TYPE_NOTIFY_SUDO:
+            case ES_EVENT_TYPE_NOTIFY_SUDO: {
                 es_event_sudo_t *sudo = event.sudo;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
@@ -1672,7 +1672,8 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
-            case ES_EVENT_TYPE_NOTIFY_OD_DELETE_USER:
+            }
+            case ES_EVENT_TYPE_NOTIFY_OD_DELETE_USER: {
                 es_event_od_delete_user_t *od_delete_user = event.od_delete_user;
                 flb_log_event_encoder_body_begin_map(encoder);
                 if (od_delete_user->instigator) {
@@ -1705,7 +1706,8 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 encode_audit_token_t(encoder, &od_delete_user->instigator_token);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
-            case ES_EVENT_TYPE_NOTIFY_OD_CREATE_USER:
+            }
+            case ES_EVENT_TYPE_NOTIFY_OD_CREATE_USER: {
                 es_event_od_create_user_t *od_create_user = event.od_create_user;
                 flb_log_event_encoder_body_begin_map(encoder);
                 if (od_create_user->instigator) {
@@ -1738,7 +1740,8 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 encode_audit_token_t(encoder, &od_create_user->instigator_token);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
-            case ES_EVENT_TYPE_NOTIFY_OD_CREATE_GROUP:
+            }
+            case ES_EVENT_TYPE_NOTIFY_OD_CREATE_GROUP: {
                 es_event_od_create_group_t *od_create_group = event.od_create_group;
                 flb_log_event_encoder_body_begin_map(encoder);
                 if (od_create_group->instigator) {
@@ -1771,7 +1774,8 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 encode_audit_token_t(encoder, &od_create_group->instigator_token);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
-            case ES_EVENT_TYPE_NOTIFY_OD_DELETE_GROUP:
+            }
+            case ES_EVENT_TYPE_NOTIFY_OD_DELETE_GROUP: {
                 es_event_od_delete_group_t *od_delete_group = event.od_delete_group;
                 flb_log_event_encoder_body_begin_map(encoder);
                 if (od_delete_group->instigator) {
@@ -1804,7 +1808,8 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 encode_audit_token_t(encoder, &od_delete_group->instigator_token);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
-            case ES_EVENT_TYPE_NOTIFY_OD_MODIFY_PASSWORD:
+            }
+            case ES_EVENT_TYPE_NOTIFY_OD_MODIFY_PASSWORD: {
                 es_event_od_modify_password_t *od_modify_password = event.od_modify_password;
                 flb_log_event_encoder_body_begin_map(encoder);
                 if (od_modify_password->instigator) {
@@ -1843,7 +1848,8 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
-            case ES_EVENT_TYPE_NOTIFY_OD_DISABLE_USER:
+            }
+            case ES_EVENT_TYPE_NOTIFY_OD_DISABLE_USER: {
                 es_event_od_disable_user_t *od_disable_user = event.od_disable_user;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
@@ -1880,7 +1886,8 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
-            case ES_EVENT_TYPE_NOTIFY_OD_ENABLE_USER:
+            }
+            case ES_EVENT_TYPE_NOTIFY_OD_ENABLE_USER: {
                 es_event_od_enable_user_t *od_enable_user = event.od_enable_user;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
@@ -1917,7 +1924,8 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
-            case ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_VALUE_ADD:
+            }
+            case ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_VALUE_ADD: {
                 es_event_od_attribute_value_add_t *od_attribute_value_add = event.od_attribute_value_add;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
@@ -1966,7 +1974,8 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
-            case ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_VALUE_REMOVE:
+            }
+            case ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_VALUE_REMOVE: {
                 es_event_od_attribute_value_remove_t *od_attribute_value_remove = event.od_attribute_value_remove;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
@@ -2015,7 +2024,8 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
-            case ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_SET:
+            }
+            case ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_SET: {
                 es_event_od_attribute_set_t *od_attribute_set = event.od_attribute_set;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
@@ -2053,7 +2063,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 for(size_t i = 0; i < od_attribute_set->attribute_value_count; i++) {
                     flb_log_event_encoder_append_body_string(
                         encoder,
-                        od_attribute_set->attribute_values[i].data, od_attribute_set->attribute_values[i].length);
+                        (char *)od_attribute_set->attribute_values[i].data, od_attribute_set->attribute_values[i].length);
                 }
                 flb_log_event_encoder_body_commit_array(encoder);
                 flb_log_event_encoder_append_body_values(
@@ -2074,7 +2084,8 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
-            case ES_EVENT_TYPE_NOTIFY_OD_GROUP_ADD:
+            }
+            case ES_EVENT_TYPE_NOTIFY_OD_GROUP_ADD: {
                 es_event_od_group_add_t *od_group_add = event.od_group_add;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
@@ -2133,7 +2144,8 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
-            case ES_EVENT_TYPE_NOTIFY_OD_GROUP_REMOVE:
+            }
+            case ES_EVENT_TYPE_NOTIFY_OD_GROUP_REMOVE: {
                 es_event_od_group_remove_t *od_group_remove = event.od_group_remove;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
@@ -2192,7 +2204,8 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
-            case ES_EVENT_TYPE_NOTIFY_OD_GROUP_SET:
+            }
+            case ES_EVENT_TYPE_NOTIFY_OD_GROUP_SET: {
                 es_event_od_group_set_t *od_group_set = event.od_group_set;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
@@ -2227,7 +2240,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                     for (size_t i = 0; i < od_group_set->members->member_count; i++) {
                         flb_log_event_encoder_append_body_string(
                             encoder,
-                            od_group_set->members->member_array.names[i].data,
+                            (char *)od_group_set->members->member_array.names[i].data,
                             od_group_set->members->member_array.names[i].length);
                     }
                 } else {
@@ -2257,7 +2270,8 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
-            case ES_EVENT_TYPE_NOTIFY_AUTHENTICATION:
+            }
+            case ES_EVENT_TYPE_NOTIFY_AUTHENTICATION: {
                 es_event_authentication_t *authentication = event.authentication;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
@@ -2306,6 +2320,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
