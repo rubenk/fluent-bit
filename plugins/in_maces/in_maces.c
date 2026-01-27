@@ -24,6 +24,7 @@
 #include <bsm/libbsm.h>
 #include <sys/types.h>
 #include <sys/acl.h>
+#include <uuid/uuid.h>
 
 #include "events.h"
 
