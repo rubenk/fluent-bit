@@ -2410,6 +2410,12 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
 
     if (res != ES_NEW_CLIENT_RESULT_SUCCESS) {
         switch(res) {
+            case ES_NEW_CLIENT_RESULT_ERR_INVALID_ARGUMENT:
+                flb_plg_error(ins, "Invalid argument provided to es_new_client");
+                break;
+            case ES_NEW_CLIENT_RESULT_ERR_INTERNAL:
+                flb_plg_error(ins, "Internal ES client error");
+                break;
             case ES_NEW_CLIENT_RESULT_ERR_NOT_ENTITLED:
                 flb_plg_error(ins, "Application requires 'com.apple.developer.endpoint-security.client' entitlement");
                 break;
@@ -2419,10 +2425,12 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
             case ES_NEW_CLIENT_RESULT_ERR_NOT_PRIVILEGED:
                 flb_plg_error(ins, "Application needs to run as root");
                 break;
-            default:
-                flb_plg_error(ins, "Unknown error");
+            case ES_NEW_CLIENT_RESULT_ERR_TOO_MANY_CLIENTS:
+                flb_plg_error(ins, "Too many ES clients already exist on this system");
                 break;
-              // TODO: handle all documented errors in the enum
+            default:
+                flb_plg_error(ins, "Unknown ES client creation error (code %d)", res);
+                break;
         }
         pthread_mutex_destroy(&ctx->encoder_mutex);
         flb_log_event_encoder_destroy(ctx->encoder);
