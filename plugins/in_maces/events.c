@@ -190,6 +190,9 @@ const char *event_type_str(const es_event_type_t event_type) {
         "ES_EVENT_TYPE_NOTIFY_TCC_MODIFY"
     };
 
+  if (event_type >= sizeof(names) / sizeof(names[0])) {
+      return "UNKNOWN";
+  }
   return names[event_type];
 }
 
