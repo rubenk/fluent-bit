@@ -2214,29 +2214,31 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
                     "members");
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("member_type"),
+                    FLB_LOG_EVENT_INT32_VALUE(od_group_set->members->member_type));
+                flb_log_event_encoder_append_body_cstring(
+                    encoder,
+                    "member_values");
                 flb_log_event_encoder_body_begin_array(encoder);
-                for (size_t i = 0; i < od_group_set->member_count; i++) {
-                    flb_log_event_encoder_body_begin_map(encoder);
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("member_type"),
-                        FLB_LOG_EVENT_INT32_VALUE(od_group_set->members[i].member_type));
-                    if (od_group_set->members[i].member_type == ES_OD_MEMBER_TYPE_USER_NAME) {
-                        flb_log_event_encoder_append_body_values(
+                if (od_group_set->members->member_type == ES_OD_MEMBER_TYPE_USER_NAME) {
+                    for (size_t i = 0; i < od_group_set->members->member_count; i++) {
+                        flb_log_event_encoder_append_body_string(
                             encoder,
-                            FLB_LOG_EVENT_CSTRING_VALUE("member_value"),
-                            FLB_LOG_EVENT_STRING_VALUE(od_group_set->members[i].member_value.name.data, od_group_set->members[i].member_value.name.length));
-                    } else {
-                        uuid_string_t uuidstr;
-                        uuid_unparse(od_group_set->members[i].member_value.uuid, uuidstr);
-                        flb_log_event_encoder_append_body_values(
-                            encoder,
-                            FLB_LOG_EVENT_CSTRING_VALUE("member_value"),
-                            FLB_LOG_EVENT_CSTRING_VALUE(uuidstr));
+                            od_group_set->members->member_array.names[i].data,
+                            od_group_set->members->member_array.names[i].length);
                     }
-                    flb_log_event_encoder_body_commit_map(encoder);
+                } else {
+                    for (size_t i = 0; i < od_group_set->members->member_count; i++) {
+                        uuid_string_t uuidstr;
+                        uuid_unparse(od_group_set->members->member_array.uuids[i], uuidstr);
+                        flb_log_event_encoder_append_body_cstring(encoder, uuidstr);
+                    }
                 }
                 flb_log_event_encoder_body_commit_array(encoder);
+                flb_log_event_encoder_body_commit_map(encoder);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
