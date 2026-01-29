@@ -1276,10 +1276,10 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                             "argv");
                         flb_log_event_encoder_body_begin_array(encoder);
                         for(size_t i = 0; i < event.su->argc; i++) {
-                        flb_log_event_encoder_append_body_string(
-                            encoder,
-                            event.su->argv[i].data,
-                            event.su->argv[i].length);
+                            flb_log_event_encoder_append_body_string(
+                                encoder,
+                                (char *)event.su->argv[i].data,
+                                event.su->argv[i].length);
                         }
                         flb_log_event_encoder_body_commit_array(encoder);
                         flb_log_event_encoder_append_body_cstring(
@@ -1287,10 +1287,10 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                             "env");
                         flb_log_event_encoder_body_begin_array(encoder);
                         for(size_t i = 0; i < event.su->env_count; i++) {
-                        flb_log_event_encoder_append_body_string(
-                            encoder,
-                            event.su->env[i].data,
-                            event.su->env[i].length);
+                            flb_log_event_encoder_append_body_string(
+                                encoder,
+                                (char *)event.su->env[i].data,
+                                event.su->env[i].length);
                         }
                         flb_log_event_encoder_body_commit_array(encoder);
                     }
