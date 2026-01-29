@@ -5,7 +5,7 @@ This document tracks all improvements for the `in_maces` plugin, including compl
 **Quick Status:**
 - ✅ **P0 (Critical):** 4/4 complete
 - 🔄 **P1 (High Priority):** 4/5 complete (1 won't fix)
-- ⏳ **P2 (Medium Priority):** 3/9 complete
+- ⏳ **P2 (Medium Priority):** 3/10 complete
 - **Total commits:** 34
 
 ---
@@ -405,6 +405,27 @@ static int encode_timespec(struct flb_log_event_encoder *encoder,
 
 ---
 
+### 16. FLB_MINIMAL Build Broken
+
+**Location:** Fluent Bit cmake configuration
+
+**Issue:** Building with `-DFLB_MINIMAL=On` fails due to missing generated headers:
+- `mk_core/mk_core_info.h` not found
+- `monkey/mk_info.h` not found
+
+The monkey library headers are generated during cmake but the include paths aren't set up correctly when using the minimal build configuration.
+
+**Impact:**
+- Cannot do minimal/fast development builds with just maces + stdout
+- Full builds take longer and produce larger binaries
+
+**Fix:** This is a Fluent Bit core issue, not specific to maces. Options:
+1. Report upstream to Fluent Bit
+2. Work around by manually copying generated headers
+3. Fix cmake target dependencies in lib/monkey
+
+---
+
 ## Summary
 
 ### Work Completed
@@ -432,7 +453,7 @@ static int encode_timespec(struct flb_log_event_encoder *encoder,
 |----------|-------|----------|-----------|-----------|--------|
 | P0 (Critical) | 4 | 4 ✅ | 0 | 0 | Complete |
 | P1 (High) | 6 | 4 ✅ | 1 ❌ | 1 | Nearly done |
-| P2 (Medium) | 9 | 3 ✅ | 0 | 6 | In progress |
+| P2 (Medium) | 10 | 3 ✅ | 0 | 7 | In progress |
 
 ### Recommended Order
 
