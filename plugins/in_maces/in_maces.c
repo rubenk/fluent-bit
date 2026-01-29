@@ -43,11 +43,8 @@ static int parse_events_config(struct flb_maces_config *ctx,
     int ret;
 
     if (!ctx->events_str) {
-        /* No configuration, no events subscribed by default */
-        ctx->events_count = 0;
-        ctx->events = NULL;
-        flb_plg_warn(ins, "No events configured, no events will be captured");
-        return 0;
+        flb_plg_error(ins, "No events configured. Set 'events' to a comma-separated list of event types.");
+        return -1;
     }
 
     /* Split comma-separated string into list */
@@ -230,7 +227,7 @@ static int in_maces_exit(void *data, struct flb_config *config)
 static struct flb_config_map config_map[] = {
     {
      FLB_CONFIG_MAP_STR, "events", NULL,
-     0, FLB_FALSE, offsetof(struct flb_maces_config, events_str),
+     0, FLB_TRUE, offsetof(struct flb_maces_config, events_str),
      "Comma-separated list of events to subscribe (lowercase, without NOTIFY_ prefix). "
      "Examples: exec,fork,exit or authentication,sudo,su. "
      "Available types: exec, fork, exit, close, create, exchangedata, kextload, "
