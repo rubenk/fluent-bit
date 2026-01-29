@@ -32,7 +32,7 @@
 /* Parse comma-separated event types configuration string
  * Returns 0 on success, -1 on error
  */
-static int parse_event_types_config(struct flb_maces_config *ctx,
+static int parse_events_config(struct flb_maces_config *ctx,
                                      struct flb_input_instance *ins) {
     struct mk_list event_list;
     struct mk_list *head;
@@ -42,19 +42,19 @@ static int parse_event_types_config(struct flb_maces_config *ctx,
     size_t capacity = 16;
     int ret;
 
-    if (!ctx->event_types_str) {
+    if (!ctx->events_str) {
         /* No configuration, no events subscribed by default */
         ctx->events_count = 0;
         ctx->events = NULL;
-        flb_plg_warn(ins, "No event_types configured, no events will be captured");
+        flb_plg_warn(ins, "No events configured, no events will be captured");
         return 0;
     }
 
     /* Split comma-separated string into list */
     mk_list_init(&event_list);
-    ret = flb_slist_split_string(&event_list, ctx->event_types_str, ',', -1);
+    ret = flb_slist_split_string(&event_list, ctx->events_str, ',', -1);
     if (ret == -1 || ret == 0) {
-        flb_plg_error(ins, "Failed to parse event_types configuration");
+        flb_plg_error(ins, "Failed to parse events configuration");
         return -1;
     }
 
@@ -132,7 +132,7 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
     flb_input_set_context(ins, ctx);
 
     /* Parse event types configuration */
-    if (parse_event_types_config(ctx, ins) != 0) {
+    if (parse_events_config(ctx, ins) != 0) {
         flb_plg_error(ins, "Failed to parse event types configuration");
         pthread_mutex_destroy(&ctx->encoder_mutex);
         flb_log_event_encoder_destroy(ctx->encoder);
@@ -229,11 +229,10 @@ static int in_maces_exit(void *data, struct flb_config *config)
 /* Configuration map */
 static struct flb_config_map config_map[] = {
     {
-     FLB_CONFIG_MAP_STR, "event_types", NULL,
-     0, FLB_FALSE, offsetof(struct flb_maces_config, event_types_str),
-     "Comma-separated list of event types to subscribe (lowercase, without NOTIFY_ prefix). "
+     FLB_CONFIG_MAP_STR, "events", NULL,
+     0, FLB_FALSE, offsetof(struct flb_maces_config, events_str),
+     "Comma-separated list of events to subscribe (lowercase, without NOTIFY_ prefix). "
      "Examples: exec,fork,exit or authentication,sudo,su. "
-     "Default: exec,fork,exit. "
      "Available types: exec, fork, exit, close, create, exchangedata, kextload, "
      "kextunload, link, mmap, mprotect, mount, unmount, iokit_open, rename, "
      "setattrlist, setextattr, setflags, setmode, setowner, signal, unlink, write, "

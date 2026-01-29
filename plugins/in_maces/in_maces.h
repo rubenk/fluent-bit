@@ -33,7 +33,7 @@ struct flb_maces_config {
     pthread_mutex_t encoder_mutex;
 
     /* Configuration */
-    char *event_types_str;        /* Comma-separated event type names from config */
+    char *events_str;             /* Comma-separated event type names from config */
     es_event_type_t *events;      /* Parsed array of event types to subscribe */
     size_t events_count;          /* Number of event types in the array */
 };
