@@ -43,16 +43,10 @@ static int parse_event_types_config(struct flb_maces_config *ctx,
     int ret;
 
     if (!ctx->event_types_str) {
-        /* No configuration, use defaults */
-        ctx->events_count = 3;
-        ctx->events = flb_malloc(sizeof(es_event_type_t) * ctx->events_count);
-        if (!ctx->events) {
-            return -1;
-        }
-        ctx->events[0] = ES_EVENT_TYPE_NOTIFY_EXEC;
-        ctx->events[1] = ES_EVENT_TYPE_NOTIFY_FORK;
-        ctx->events[2] = ES_EVENT_TYPE_NOTIFY_EXIT;
-        flb_plg_info(ins, "Using default event types: exec, fork, exit");
+        /* No configuration, no events subscribed by default */
+        ctx->events_count = 0;
+        ctx->events = NULL;
+        flb_plg_warn(ins, "No event_types configured, no events will be captured");
         return 0;
     }
 
