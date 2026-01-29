@@ -5,8 +5,8 @@ This document tracks all improvements for the `in_maces` plugin, including compl
 **Quick Status:**
 - ✅ **P0 (Critical):** 4/4 complete
 - 🔄 **P1 (High Priority):** 4/5 complete (1 won't fix)
-- ⏳ **P2 (Medium Priority):** 0/9 complete
-- **Total commits:** 25
+- ⏳ **P2 (Medium Priority):** 3/9 complete
+- **Total commits:** 34
 
 ---
 
@@ -20,9 +20,14 @@ This document tracks all improvements for the `in_maces` plugin, including compl
 
 ### P1 (High Priority)
 - ✅ Added return value checks for all encoder operations
-- ✅ Made event types configurable (lowercase names, NOTIFY_-only)
+- ✅ Made events configurable (lowercase names, NOTIFY_-only, no default)
 - ✅ Fixed cleanup on subscription failure
 - ❌ Won't fix: Input validation (ES framework is trusted)
+
+### P2 (Medium Priority)
+- ✅ Fixed magic numbers (use sizeof(es_cdhash_t))
+- ✅ Fixed inconsistent null check style (explicit null everywhere)
+- ✅ Fixed TODOs in code (dev_t major/minor)
 
 ---
 
@@ -75,13 +80,13 @@ flb_log_event_encoder_reset(encoder);
 
 **What was implemented:**
 - Made event types configurable via plugin config
-- Added `event_types` configuration option
+- Added `events` configuration option
 - Users can specify comma-separated event names (e.g., "exec,fork,authentication")
 - Lowercase names without NOTIFY_ prefix for user-friendly config
 - Only NOTIFY_ events allowed (AUTH_ events excluded)
 - Single source of truth in events.c
 - Used Fluent Bit's flb_slist API for parsing
-- Default: "exec,fork,exit"
+- No default - events must be explicitly configured
 
 ---
 
@@ -90,7 +95,7 @@ flb_log_event_encoder_reset(encoder);
 **Status:** ✅ Complete (part of P1.2 implementation)
 
 **What was implemented:**
-- Added `config_map` with event_types option
+- Added `config_map` with events option
 - Configurable event subscription via comma-separated list
 - Dynamic event array allocation
 - Proper cleanup in all error paths
@@ -255,78 +260,39 @@ es_handler_block_t handler = ^(es_client_t *c, const es_message_t *msg) {
 
 ---
 
-### 10. TODOs in Code
+### 10. ~~TODOs in Code~~ ✅ FIXED
 
-**Location:** Line 1420
+**Status:** ✅ Complete (commit 88b211b67)
 
-**Issue:** Incomplete functionality:
-```c
-// TODO: decode dev_t into major and minor
-```
-
-**Fix:** Either:
-- Implement the TODO:
-```c
-flb_log_event_encoder_append_body_values(
-    encoder,
-    FLB_LOG_EVENT_CSTRING_VALUE("dev_major"),
-    FLB_LOG_EVENT_UINT32_VALUE(major(device)),
-    FLB_LOG_EVENT_CSTRING_VALUE("dev_minor"),
-    FLB_LOG_EVENT_UINT32_VALUE(minor(device)));
-```
-- Or document why it's deferred with a better comment
+**What was implemented:**
+- Decoded dev_t into dev_major and dev_minor using major() and minor() macros
+- Applied to both PTY_GRANT and PTY_CLOSE events
 
 ---
 
-### 11. Magic Numbers
+### 11. ~~Magic Numbers~~ ✅ FIXED
 
-**Location:** Line 354
+**Status:** ✅ Complete (commit 1b79eb7f4)
 
-**Issue:** Hardcoded numbers without explanation:
-```c
-for (size_t i = 0; i < 20; i++) {  // Why 20?
-```
-
-**Fix:** Use named constants:
-```c
-#define ES_CDHASH_SIZE 20  // Size of code directory hash in bytes
-
-// Later in code:
-for (size_t i = 0; i < ES_CDHASH_SIZE; i++) {
-```
+**What was implemented:**
+- Replaced magic number 20 with sizeof(es_cdhash_t)
+- es_cdhash_t is defined in EndpointSecurity/ESTypes.h as uint8_t[20]
+- Self-documenting and will adapt if Apple changes the size
 
 ---
 
-### 12. Inconsistent Null Check Style
+### 12. ~~Inconsistent Null Check Style~~ ✅ FIXED
 
-**Location:** Throughout handler
+**Status:** ✅ Complete (commit 6e0f3d53f)
 
-**Issue:** Inconsistent handling of optional fields:
-
-**Style 1 - Explicit null:**
-```c
-if (od_disable_user->instigator) {
-    encode_es_process_t(encoder, od_disable_user->instigator);
-} else {
-    flb_log_event_encoder_append_body_null(encoder);
-}
-```
-
-**Style 2 - Field omitted:**
-```c
-if (event.signal.instigator) {
-    flb_log_event_encoder_append_body_cstring(encoder, "instigator");
-    encode_es_process_t(encoder, event.signal.instigator);
-}
-// No else - field not present in output
-```
-
-**Impact:** Inconsistent JSON schema - sometimes null, sometimes field missing.
-
-**Fix:**
-- Choose one approach and document it
-- Apply consistently across all optional fields
-- Consider: explicit null is better for schema consistency
+**What was implemented:**
+- Standardized on explicit null for all optional fields
+- Fields are always present with either a value or null
+- Consistent JSON schema for downstream consumers
+- Fixed: signal.instigator, file_provider_materialize.instigator,
+  btm_launch_item_add (instigator, app, tokens),
+  btm_launch_item_remove (instigator, app, tokens),
+  authentication.data.od.instigator
 
 ---
 
@@ -466,7 +432,7 @@ static int encode_timespec(struct flb_log_event_encoder *encoder,
 |----------|-------|----------|-----------|-----------|--------|
 | P0 (Critical) | 4 | 4 ✅ | 0 | 0 | Complete |
 | P1 (High) | 6 | 4 ✅ | 1 ❌ | 1 | Nearly done |
-| P2 (Medium) | 9 | 0 | 0 | 9 | Not started |
+| P2 (Medium) | 9 | 3 ✅ | 0 | 6 | In progress |
 
 ### Recommended Order
 
@@ -524,11 +490,24 @@ All commits made to improve the maces plugin:
 22. **05aaaae40** - Use Fluent Bit's flb_slist API for string splitting
 23. **6e81db2be** - Fix cleanup on subscription failure
 
+### P2 Medium Priority Fixes
+
+26. **1b79eb7f4** - Use sizeof(es_cdhash_t) instead of magic number 20
+27. **6e0f3d53f** - Use explicit null for optional fields instead of omitting them
+28. **88b211b67** - Decode dev_t into major and minor device numbers
+29. **c6f18cd57** - Fix const char pointer warnings in su event encoding
+
+### Configuration Fixes
+
+30. **f03dd5254** - Change event_types default to none
+31. **0b4781abe** - Rename event_types config option to events
+32. **29019609c** - Fix events config: require explicit config, fix config map loading
+
 ### Documentation
 
-24. **5be8f454c** - Add comprehensive improvements tracking document
-25. **a541ac627** - Update IMPROVEMENTS.md to mark return value checking as complete
+33. **5be8f454c** - Add comprehensive improvements tracking document
+34. **a541ac627** - Update IMPROVEMENTS.md to mark return value checking as complete
 
 ---
 
-**Last Updated:** 2026-01-27
+**Last Updated:** 2026-01-29
