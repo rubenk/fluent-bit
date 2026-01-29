@@ -342,12 +342,12 @@ int encode_es_process_t(struct flb_log_event_encoder *encoder, const es_process_
         FLB_LOG_EVENT_CSTRING_VALUE("is_es_client"),
         FLB_LOG_EVENT_BOOLEAN_VALUE(process->is_es_client));
     static const char hex_digits[] = "0123456789ABCDEF";
-    char cdhash[41];
-    for (size_t i = 0; i < 20; i++) {
+    char cdhash[sizeof(es_cdhash_t) * 2 + 1];
+    for (size_t i = 0; i < sizeof(es_cdhash_t); i++) {
       cdhash[i * 2] = hex_digits[(process->cdhash[i] >> 4) & 0x0F];
       cdhash[i * 2 + 1] = hex_digits[process->cdhash[i] & 0x0F];
     }
-    cdhash[40] = '\0';
+    cdhash[sizeof(es_cdhash_t) * 2] = '\0';
     flb_log_event_encoder_append_body_values(
         encoder,
         FLB_LOG_EVENT_CSTRING_VALUE("cdhash"),
