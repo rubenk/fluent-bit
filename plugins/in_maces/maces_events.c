@@ -400,11 +400,11 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                     encoder,
                     "target");
                 encode_es_process_t(encoder, event.signal.target);
+                flb_log_event_encoder_append_body_cstring(encoder, "instigator");
                 if (event.signal.instigator) {
-                  flb_log_event_encoder_append_body_cstring(
-                      encoder,
-                      "instigator");
-                  encode_es_process_t(encoder, event.signal.instigator);
+                    encode_es_process_t(encoder, event.signal.instigator);
+                } else {
+                    flb_log_event_encoder_append_body_null(encoder);
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
@@ -726,11 +726,11 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 break;
             case ES_EVENT_TYPE_NOTIFY_FILE_PROVIDER_MATERIALIZE:
                 flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_cstring(encoder, "instigator");
                 if (event.file_provider_materialize.instigator) {
-                    flb_log_event_encoder_append_body_cstring(
-                        encoder,
-                        "instigator");
                     encode_es_process_t(encoder, event.file_provider_materialize.instigator);
+                } else {
+                    flb_log_event_encoder_append_body_null(encoder);
                 }
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
@@ -1109,17 +1109,17 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
             case ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_ADD:
                 if (event.btm_launch_item_add) {
                     flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_cstring(encoder, "instigator");
                     if (event.btm_launch_item_add->instigator) {
-                        flb_log_event_encoder_append_body_cstring(
-                            encoder,
-                            "instigator");
                         encode_es_process_t(encoder, event.btm_launch_item_add->instigator);
+                    } else {
+                        flb_log_event_encoder_append_body_null(encoder);
                     }
+                    flb_log_event_encoder_append_body_cstring(encoder, "app");
                     if (event.btm_launch_item_add->app) {
-                        flb_log_event_encoder_append_body_cstring(
-                            encoder,
-                            "app");
                         encode_es_process_t(encoder, event.btm_launch_item_add->app);
+                    } else {
+                        flb_log_event_encoder_append_body_null(encoder);
                     }
                     encode_btm_launch_item_t(encoder, event.btm_launch_item_add->item);
                     flb_log_event_encoder_append_body_values(
@@ -1127,17 +1127,17 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                         FLB_LOG_EVENT_CSTRING_VALUE("executable_path"),
                         FLB_LOG_EVENT_STRING_VALUE(event.btm_launch_item_add->executable_path.data, event.btm_launch_item_add->executable_path.length));
                     if (msg->version >= 8) {
+                        flb_log_event_encoder_append_body_cstring(encoder, "instigator_token");
                         if (event.btm_launch_item_add->instigator_token) {
-                            flb_log_event_encoder_append_body_cstring(
-                                encoder,
-                                "instigator_token");
                             encode_audit_token_t(encoder, event.btm_launch_item_add->instigator_token);
+                        } else {
+                            flb_log_event_encoder_append_body_null(encoder);
                         }
+                        flb_log_event_encoder_append_body_cstring(encoder, "app_token");
                         if (event.btm_launch_item_add->app_token) {
-                            flb_log_event_encoder_append_body_cstring(
-                                encoder,
-                                "app_token");
                             encode_audit_token_t(encoder, event.btm_launch_item_add->app_token);
+                        } else {
+                            flb_log_event_encoder_append_body_null(encoder);
                         }
                     }
                     flb_log_event_encoder_body_commit_map(encoder);
@@ -1146,31 +1146,31 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
             case ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_REMOVE:
                 if (event.btm_launch_item_remove) {
                     flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_cstring(encoder, "instigator");
                     if (event.btm_launch_item_remove->instigator) {
-                        flb_log_event_encoder_append_body_cstring(
-                            encoder,
-                            "instigator");
                         encode_es_process_t(encoder, event.btm_launch_item_remove->instigator);
+                    } else {
+                        flb_log_event_encoder_append_body_null(encoder);
                     }
+                    flb_log_event_encoder_append_body_cstring(encoder, "app");
                     if (event.btm_launch_item_remove->app) {
-                        flb_log_event_encoder_append_body_cstring(
-                            encoder,
-                            "app");
                         encode_es_process_t(encoder, event.btm_launch_item_remove->app);
+                    } else {
+                        flb_log_event_encoder_append_body_null(encoder);
                     }
                     encode_btm_launch_item_t(encoder, event.btm_launch_item_remove->item);
                     if (msg->version >= 8) {
+                        flb_log_event_encoder_append_body_cstring(encoder, "instigator_token");
                         if (event.btm_launch_item_remove->instigator_token) {
-                            flb_log_event_encoder_append_body_cstring(
-                                encoder,
-                                "instigator_token");
                             encode_audit_token_t(encoder, event.btm_launch_item_remove->instigator_token);
+                        } else {
+                            flb_log_event_encoder_append_body_null(encoder);
                         }
+                        flb_log_event_encoder_append_body_cstring(encoder, "app_token");
                         if (event.btm_launch_item_remove->app_token) {
-                            flb_log_event_encoder_append_body_cstring(
-                                encoder,
-                                "app_token");
                             encode_audit_token_t(encoder, event.btm_launch_item_remove->app_token);
+                        } else {
+                            flb_log_event_encoder_append_body_null(encoder);
                         }
                     }
                     flb_log_event_encoder_body_commit_map(encoder);
@@ -1988,11 +1988,11 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                     FLB_LOG_EVENT_INT32_VALUE(authentication->type));
                 switch(authentication->type) {
                     case ES_AUTHENTICATION_TYPE_OD:
+                      flb_log_event_encoder_append_body_cstring(encoder, "instigator");
                       if (authentication->data.od->instigator) {
-                        flb_log_event_encoder_append_body_cstring(
-                            encoder,
-                            "instigator");
-                        encode_es_process_t(encoder, authentication->data.od->instigator);
+                          encode_es_process_t(encoder, authentication->data.od->instigator);
+                      } else {
+                          flb_log_event_encoder_append_body_null(encoder);
                       }
                       flb_log_event_encoder_append_body_values(
                           encoder,
