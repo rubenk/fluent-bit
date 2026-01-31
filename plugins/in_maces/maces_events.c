@@ -2121,6 +2121,39 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_XP_MALWARE_DETECTED:
+                if (event.xp_malware_detected) {
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("signature_version"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.xp_malware_detected->signature_version.data,
+                                                   event.xp_malware_detected->signature_version.length));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("malware_identifier"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.xp_malware_detected->malware_identifier.data,
+                                                   event.xp_malware_detected->malware_identifier.length));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("incident_identifier"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.xp_malware_detected->incident_identifier.data,
+                                                   event.xp_malware_detected->incident_identifier.length));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("detected_path"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.xp_malware_detected->detected_path.data,
+                                                   event.xp_malware_detected->detected_path.length));
+                    if (msg->version >= 10) {
+                        flb_log_event_encoder_append_body_values(
+                            encoder,
+                            FLB_LOG_EVENT_CSTRING_VALUE("detected_executable"),
+                            FLB_LOG_EVENT_STRING_VALUE(event.xp_malware_detected->detected_executable.data,
+                                                       event.xp_malware_detected->detected_executable.length));
+                    }
+                    flb_log_event_encoder_body_commit_map(encoder);
+                }
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
