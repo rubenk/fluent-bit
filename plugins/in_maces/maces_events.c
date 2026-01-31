@@ -1371,68 +1371,69 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_SU:
-                if (event.su) {
-                    flb_log_event_encoder_body_begin_map(encoder);
+            case ES_EVENT_TYPE_NOTIFY_SU: {
+                es_event_su_t *su = event.su;
+                if (su == NULL) break;
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("success"),
+                    FLB_LOG_EVENT_BOOLEAN_VALUE(su->success));
+                if(!su->success) {
                     flb_log_event_encoder_append_body_values(
                         encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("success"),
-                        FLB_LOG_EVENT_BOOLEAN_VALUE(event.su->success));
-                    if(!event.su->success) {
-                        flb_log_event_encoder_append_body_values(
-                            encoder,
-                            FLB_LOG_EVENT_CSTRING_VALUE("failure_message"),
-                            FLB_LOG_EVENT_STRING_VALUE(event.su->failure_message.data, event.su->failure_message.length));
-                    }
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("from_uid"),
-                        FLB_LOG_EVENT_UINT32_VALUE(event.su->from_uid));
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("from_username"),
-                        FLB_LOG_EVENT_STRING_VALUE(event.su->from_username.data, event.su->from_username.length));
-                    if (event.su->has_to_uid) {
-                      flb_log_event_encoder_append_body_values(
-                          encoder,
-                          FLB_LOG_EVENT_CSTRING_VALUE("uid"),
-                          FLB_LOG_EVENT_UINT32_VALUE(event.su->to_uid.uid));
-                    }
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("to_username"),
-                        FLB_LOG_EVENT_STRING_VALUE(event.su->to_username.data, event.su->to_username.length));
-                    if(event.su->success) {
-                        flb_log_event_encoder_append_body_values(
-                            encoder,
-                            FLB_LOG_EVENT_CSTRING_VALUE("shell"),
-                            FLB_LOG_EVENT_STRING_VALUE(event.su->shell.data, event.su->shell.length));
-                        flb_log_event_encoder_append_body_cstring(
-                            encoder,
-                            "argv");
-                        flb_log_event_encoder_body_begin_array(encoder);
-                        for(size_t i = 0; i < event.su->argc; i++) {
-                            flb_log_event_encoder_append_body_string(
-                                encoder,
-                                (char *)event.su->argv[i].data,
-                                event.su->argv[i].length);
-                        }
-                        flb_log_event_encoder_body_commit_array(encoder);
-                        flb_log_event_encoder_append_body_cstring(
-                            encoder,
-                            "env");
-                        flb_log_event_encoder_body_begin_array(encoder);
-                        for(size_t i = 0; i < event.su->env_count; i++) {
-                            flb_log_event_encoder_append_body_string(
-                                encoder,
-                                (char *)event.su->env[i].data,
-                                event.su->env[i].length);
-                        }
-                        flb_log_event_encoder_body_commit_array(encoder);
-                    }
-                    flb_log_event_encoder_body_commit_map(encoder);
+                        FLB_LOG_EVENT_CSTRING_VALUE("failure_message"),
+                        FLB_LOG_EVENT_STRING_VALUE(su->failure_message.data, su->failure_message.length));
                 }
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("from_uid"),
+                    FLB_LOG_EVENT_UINT32_VALUE(su->from_uid));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("from_username"),
+                    FLB_LOG_EVENT_STRING_VALUE(su->from_username.data, su->from_username.length));
+                if (su->has_to_uid) {
+                  flb_log_event_encoder_append_body_values(
+                      encoder,
+                      FLB_LOG_EVENT_CSTRING_VALUE("uid"),
+                      FLB_LOG_EVENT_UINT32_VALUE(su->to_uid.uid));
+                }
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("to_username"),
+                    FLB_LOG_EVENT_STRING_VALUE(su->to_username.data, su->to_username.length));
+                if(su->success) {
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("shell"),
+                        FLB_LOG_EVENT_STRING_VALUE(su->shell.data, su->shell.length));
+                    flb_log_event_encoder_append_body_cstring(
+                        encoder,
+                        "argv");
+                    flb_log_event_encoder_body_begin_array(encoder);
+                    for(size_t i = 0; i < su->argc; i++) {
+                        flb_log_event_encoder_append_body_string(
+                            encoder,
+                            (char *)su->argv[i].data,
+                            su->argv[i].length);
+                    }
+                    flb_log_event_encoder_body_commit_array(encoder);
+                    flb_log_event_encoder_append_body_cstring(
+                        encoder,
+                        "env");
+                    flb_log_event_encoder_body_begin_array(encoder);
+                    for(size_t i = 0; i < su->env_count; i++) {
+                        flb_log_event_encoder_append_body_string(
+                            encoder,
+                            (char *)su->env[i].data,
+                            su->env[i].length);
+                    }
+                    flb_log_event_encoder_body_commit_array(encoder);
+                }
+                flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_SUDO: {
                 es_event_sudo_t *sudo = event.sudo;
                 if (!sudo) break;
