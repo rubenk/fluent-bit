@@ -563,18 +563,20 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_IOKIT_OPEN:
+            case ES_EVENT_TYPE_NOTIFY_IOKIT_OPEN: {
+                es_event_iokit_open_t *iokit_open = &event.iokit_open;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("user_client_type"),
-                    FLB_LOG_EVENT_UINT32_VALUE(event.iokit_open.user_client_type));
+                    FLB_LOG_EVENT_UINT32_VALUE(iokit_open->user_client_type));
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("user_client_class"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.iokit_open.user_client_class.data, event.iokit_open.user_client_class.length));
+                    FLB_LOG_EVENT_STRING_VALUE(iokit_open->user_client_class.data, iokit_open->user_client_class.length));
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_READLINK:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
