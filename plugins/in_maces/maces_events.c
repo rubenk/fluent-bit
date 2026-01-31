@@ -2329,6 +2329,54 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                     flb_log_event_encoder_body_commit_map(encoder);
                 }
                 break;
+            case ES_EVENT_TYPE_NOTIFY_AUTHORIZATION_JUDGEMENT:
+                if (event.authorization_judgement) {
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_cstring(encoder, "instigator");
+                    if (event.authorization_judgement->instigator) {
+                        encode_es_process_t(encoder, event.authorization_judgement->instigator);
+                    } else {
+                        flb_log_event_encoder_append_body_null(encoder);
+                    }
+                    flb_log_event_encoder_append_body_cstring(encoder, "petitioner");
+                    if (event.authorization_judgement->petitioner) {
+                        encode_es_process_t(encoder, event.authorization_judgement->petitioner);
+                    } else {
+                        flb_log_event_encoder_append_body_null(encoder);
+                    }
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("return_code"),
+                        FLB_LOG_EVENT_INT32_VALUE(event.authorization_judgement->return_code));
+                    flb_log_event_encoder_append_body_cstring(encoder, "results");
+                    flb_log_event_encoder_body_begin_array(encoder);
+                    for (size_t i = 0; i < event.authorization_judgement->result_count; i++) {
+                        flb_log_event_encoder_body_begin_map(encoder);
+                        flb_log_event_encoder_append_body_values(
+                            encoder,
+                            FLB_LOG_EVENT_CSTRING_VALUE("right_name"),
+                            FLB_LOG_EVENT_STRING_VALUE(event.authorization_judgement->results[i].right_name.data,
+                                                       event.authorization_judgement->results[i].right_name.length));
+                        flb_log_event_encoder_append_body_values(
+                            encoder,
+                            FLB_LOG_EVENT_CSTRING_VALUE("rule_class"),
+                            FLB_LOG_EVENT_INT32_VALUE(event.authorization_judgement->results[i].rule_class));
+                        flb_log_event_encoder_append_body_values(
+                            encoder,
+                            FLB_LOG_EVENT_CSTRING_VALUE("granted"),
+                            FLB_LOG_EVENT_BOOLEAN_VALUE(event.authorization_judgement->results[i].granted));
+                        flb_log_event_encoder_body_commit_map(encoder);
+                    }
+                    flb_log_event_encoder_body_commit_array(encoder);
+                    if (msg->version >= 8) {
+                        flb_log_event_encoder_append_body_cstring(encoder, "instigator_token");
+                        encode_audit_token_t(encoder, &event.authorization_judgement->instigator_token);
+                        flb_log_event_encoder_append_body_cstring(encoder, "petitioner_token");
+                        encode_audit_token_t(encoder, &event.authorization_judgement->petitioner_token);
+                    }
+                    flb_log_event_encoder_body_commit_map(encoder);
+                }
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
