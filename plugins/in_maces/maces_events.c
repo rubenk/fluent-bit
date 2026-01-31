@@ -1086,42 +1086,43 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_OPENSSH_LOGIN:
-                if (event.openssh_login) {
-                    flb_log_event_encoder_body_begin_map(encoder);
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("success"),
-                        FLB_LOG_EVENT_BOOLEAN_VALUE(event.openssh_login->success));
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("result_type"),
-                        FLB_LOG_EVENT_INT32_VALUE(event.openssh_login->result_type));
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("source_address_type"),
-                        FLB_LOG_EVENT_INT32_VALUE(event.openssh_login->source_address_type));
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("source_address"),
-                        FLB_LOG_EVENT_STRING_VALUE(event.openssh_login->source_address.data, event.openssh_login->source_address.length));
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("username"),
-                        FLB_LOG_EVENT_STRING_VALUE(event.openssh_login->username.data, event.openssh_login->username.length));
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("has_uid"),
-                        FLB_LOG_EVENT_BOOLEAN_VALUE(event.openssh_login->has_uid));
-                    if (event.openssh_login->has_uid) {
-                      flb_log_event_encoder_append_body_values(
-                          encoder,
-                          FLB_LOG_EVENT_CSTRING_VALUE("uid"),
-                          FLB_LOG_EVENT_UINT32_VALUE(event.openssh_login->uid.uid));
-                    }
-                    flb_log_event_encoder_body_commit_map(encoder);
+            case ES_EVENT_TYPE_NOTIFY_OPENSSH_LOGIN: {
+                es_event_openssh_login_t *openssh_login = event.openssh_login;
+                if (openssh_login == NULL) break;
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("success"),
+                    FLB_LOG_EVENT_BOOLEAN_VALUE(openssh_login->success));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("result_type"),
+                    FLB_LOG_EVENT_INT32_VALUE(openssh_login->result_type));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("source_address_type"),
+                    FLB_LOG_EVENT_INT32_VALUE(openssh_login->source_address_type));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("source_address"),
+                    FLB_LOG_EVENT_STRING_VALUE(openssh_login->source_address.data, openssh_login->source_address.length));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("username"),
+                    FLB_LOG_EVENT_STRING_VALUE(openssh_login->username.data, openssh_login->username.length));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("has_uid"),
+                    FLB_LOG_EVENT_BOOLEAN_VALUE(openssh_login->has_uid));
+                if (openssh_login->has_uid) {
+                  flb_log_event_encoder_append_body_values(
+                      encoder,
+                      FLB_LOG_EVENT_CSTRING_VALUE("uid"),
+                      FLB_LOG_EVENT_UINT32_VALUE(openssh_login->uid.uid));
                 }
+                flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_OPENSSH_LOGOUT:
                 if (event.openssh_logout) {
                     flb_log_event_encoder_body_begin_map(encoder);
