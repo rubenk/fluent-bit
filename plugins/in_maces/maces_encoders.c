@@ -291,6 +291,93 @@ int encode_es_file_t(struct flb_log_event_encoder *encoder, const es_file_t *fil
     return 0;
 }
 
+int encode_od_instigator(struct flb_log_event_encoder *encoder,
+                         const es_process_t *instigator) {
+    flb_log_event_encoder_append_body_cstring(encoder, "instigator");
+    if (instigator) {
+        return encode_es_process_t(encoder, instigator);
+    } else {
+        return flb_log_event_encoder_append_body_null(encoder);
+    }
+}
+
+int encode_od_tail(struct flb_log_event_encoder *encoder,
+                   const es_string_token_t *node_name,
+                   const es_string_token_t *db_path,
+                   const audit_token_t *instigator_token,
+                   uint32_t msg_version) {
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
+        FLB_LOG_EVENT_STRING_VALUE(node_name->data, node_name->length));
+    if (db_path->length > 0) {
+        flb_log_event_encoder_append_body_values(
+            encoder,
+            FLB_LOG_EVENT_CSTRING_VALUE("db_path"),
+            FLB_LOG_EVENT_STRING_VALUE(db_path->data, db_path->length));
+    }
+    if (msg_version >= 8) {
+        flb_log_event_encoder_append_body_cstring(encoder, "instigator_token");
+        encode_audit_token_t(encoder, instigator_token);
+    }
+    return 0;
+}
+
+int encode_od_member(struct flb_log_event_encoder *encoder,
+                     const es_od_member_id_t *member) {
+    flb_log_event_encoder_append_body_cstring(encoder, "member");
+    flb_log_event_encoder_body_begin_map(encoder);
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("member_type"),
+        FLB_LOG_EVENT_INT32_VALUE(member->member_type));
+    if (member->member_type == ES_OD_MEMBER_TYPE_USER_NAME) {
+        flb_log_event_encoder_append_body_values(
+            encoder,
+            FLB_LOG_EVENT_CSTRING_VALUE("member_value"),
+            FLB_LOG_EVENT_STRING_VALUE(member->member_value.name.data,
+                                       member->member_value.name.length));
+    } else {
+        uuid_string_t uuidstr;
+        uuid_unparse(member->member_value.uuid, uuidstr);
+        flb_log_event_encoder_append_body_values(
+            encoder,
+            FLB_LOG_EVENT_CSTRING_VALUE("member_value"),
+            FLB_LOG_EVENT_CSTRING_VALUE(uuidstr));
+    }
+    flb_log_event_encoder_body_commit_map(encoder);
+    return 0;
+}
+
+int encode_od_members(struct flb_log_event_encoder *encoder,
+                      const es_od_member_id_array_t *members) {
+    flb_log_event_encoder_append_body_cstring(encoder, "members");
+    flb_log_event_encoder_body_begin_map(encoder);
+    flb_log_event_encoder_append_body_values(
+        encoder,
+        FLB_LOG_EVENT_CSTRING_VALUE("member_type"),
+        FLB_LOG_EVENT_INT32_VALUE(members->member_type));
+    flb_log_event_encoder_append_body_cstring(encoder, "member_values");
+    flb_log_event_encoder_body_begin_array(encoder);
+    if (members->member_type == ES_OD_MEMBER_TYPE_USER_NAME) {
+        for (size_t i = 0; i < members->member_count; i++) {
+            flb_log_event_encoder_append_body_string(
+                encoder,
+                (char *)members->member_array.names[i].data,
+                members->member_array.names[i].length);
+        }
+    } else {
+        for (size_t i = 0; i < members->member_count; i++) {
+            uuid_string_t uuidstr;
+            uuid_unparse(members->member_array.uuids[i], uuidstr);
+            flb_log_event_encoder_append_body_cstring(encoder, uuidstr);
+        }
+    }
+    flb_log_event_encoder_body_commit_array(encoder);
+    flb_log_event_encoder_body_commit_map(encoder);
+    return 0;
+}
+
 int encode_es_process_t(struct flb_log_event_encoder *encoder, const es_process_t *process) {
     flb_log_event_encoder_body_begin_map(encoder);
     flb_log_event_encoder_append_body_values(

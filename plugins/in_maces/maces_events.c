@@ -1507,12 +1507,7 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 es_event_od_delete_user_t *od_delete_user = event.od_delete_user;
                 if (!od_delete_user) break;
                 flb_log_event_encoder_body_begin_map(encoder);
-                if (od_delete_user->instigator) {
-                  flb_log_event_encoder_append_body_cstring(
-                      encoder,
-                      "instigator");
-                  encode_es_process_t(encoder, od_delete_user->instigator);
-                }
+                encode_od_instigator(encoder, od_delete_user->instigator);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("error_code"),
@@ -1521,20 +1516,9 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("user_name"),
                     FLB_LOG_EVENT_STRING_VALUE(od_delete_user->user_name.data, od_delete_user->user_name.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
-                    FLB_LOG_EVENT_STRING_VALUE(od_delete_user->node_name.data, od_delete_user->node_name.length));
-                if(od_delete_user->db_path.length > 0) {
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("db_path"),
-                        FLB_LOG_EVENT_STRING_VALUE(od_delete_user->db_path.data, od_delete_user->db_path.length));
-                }
-                flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "instigator_token");
-                encode_audit_token_t(encoder, &od_delete_user->instigator_token);
+                encode_od_tail(encoder, &od_delete_user->node_name,
+                               &od_delete_user->db_path,
+                               &od_delete_user->instigator_token, msg->version);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
@@ -1542,12 +1526,7 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 es_event_od_create_user_t *od_create_user = event.od_create_user;
                 if (!od_create_user) break;
                 flb_log_event_encoder_body_begin_map(encoder);
-                if (od_create_user->instigator) {
-                  flb_log_event_encoder_append_body_cstring(
-                      encoder,
-                      "instigator");
-                  encode_es_process_t(encoder, od_create_user->instigator);
-                }
+                encode_od_instigator(encoder, od_create_user->instigator);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("error_code"),
@@ -1556,20 +1535,9 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("user_name"),
                     FLB_LOG_EVENT_STRING_VALUE(od_create_user->user_name.data, od_create_user->user_name.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
-                    FLB_LOG_EVENT_STRING_VALUE(od_create_user->node_name.data, od_create_user->node_name.length));
-                if(od_create_user->db_path.length > 0) {
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("db_path"),
-                        FLB_LOG_EVENT_STRING_VALUE(od_create_user->db_path.data, od_create_user->db_path.length));
-                }
-                flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "instigator_token");
-                encode_audit_token_t(encoder, &od_create_user->instigator_token);
+                encode_od_tail(encoder, &od_create_user->node_name,
+                               &od_create_user->db_path,
+                               &od_create_user->instigator_token, msg->version);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
@@ -1577,12 +1545,7 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 es_event_od_create_group_t *od_create_group = event.od_create_group;
                 if (!od_create_group) break;
                 flb_log_event_encoder_body_begin_map(encoder);
-                if (od_create_group->instigator) {
-                  flb_log_event_encoder_append_body_cstring(
-                      encoder,
-                      "instigator");
-                  encode_es_process_t(encoder, od_create_group->instigator);
-                }
+                encode_od_instigator(encoder, od_create_group->instigator);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("error_code"),
@@ -1591,20 +1554,9 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("group_name"),
                     FLB_LOG_EVENT_STRING_VALUE(od_create_group->group_name.data, od_create_group->group_name.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
-                    FLB_LOG_EVENT_STRING_VALUE(od_create_group->node_name.data, od_create_group->node_name.length));
-                if(od_create_group->db_path.length > 0) {
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("db_path"),
-                        FLB_LOG_EVENT_STRING_VALUE(od_create_group->db_path.data, od_create_group->db_path.length));
-                }
-                flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "instigator_token");
-                encode_audit_token_t(encoder, &od_create_group->instigator_token);
+                encode_od_tail(encoder, &od_create_group->node_name,
+                               &od_create_group->db_path,
+                               &od_create_group->instigator_token, msg->version);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
@@ -1612,12 +1564,7 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 es_event_od_delete_group_t *od_delete_group = event.od_delete_group;
                 if (!od_delete_group) break;
                 flb_log_event_encoder_body_begin_map(encoder);
-                if (od_delete_group->instigator) {
-                  flb_log_event_encoder_append_body_cstring(
-                      encoder,
-                      "instigator");
-                  encode_es_process_t(encoder, od_delete_group->instigator);
-                }
+                encode_od_instigator(encoder, od_delete_group->instigator);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("error_code"),
@@ -1626,20 +1573,9 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("group_name"),
                     FLB_LOG_EVENT_STRING_VALUE(od_delete_group->group_name.data, od_delete_group->group_name.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
-                    FLB_LOG_EVENT_STRING_VALUE(od_delete_group->node_name.data, od_delete_group->node_name.length));
-                if(od_delete_group->db_path.length > 0) {
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("db_path"),
-                        FLB_LOG_EVENT_STRING_VALUE(od_delete_group->db_path.data, od_delete_group->db_path.length));
-                }
-                flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "instigator_token");
-                encode_audit_token_t(encoder, &od_delete_group->instigator_token);
+                encode_od_tail(encoder, &od_delete_group->node_name,
+                               &od_delete_group->db_path,
+                               &od_delete_group->instigator_token, msg->version);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
@@ -1647,12 +1583,7 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 es_event_od_modify_password_t *od_modify_password = event.od_modify_password;
                 if (!od_modify_password) break;
                 flb_log_event_encoder_body_begin_map(encoder);
-                if (od_modify_password->instigator) {
-                  flb_log_event_encoder_append_body_cstring(
-                      encoder,
-                      "instigator");
-                  encode_es_process_t(encoder, od_modify_password->instigator);
-                }
+                encode_od_instigator(encoder, od_modify_password->instigator);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("error_code"),
@@ -1665,22 +1596,9 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("account_name"),
                     FLB_LOG_EVENT_STRING_VALUE(od_modify_password->account_name.data, od_modify_password->account_name.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
-                    FLB_LOG_EVENT_STRING_VALUE(od_modify_password->node_name.data, od_modify_password->node_name.length));
-                if(od_modify_password->db_path.length > 0) {
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("db_path"),
-                        FLB_LOG_EVENT_STRING_VALUE(od_modify_password->db_path.data, od_modify_password->db_path.length));
-                }
-                if (msg->version >= 8) {
-                  flb_log_event_encoder_append_body_cstring(
-                      encoder,
-                      "instigator_token");
-                  encode_audit_token_t(encoder, &od_modify_password->instigator_token);
-                }
+                encode_od_tail(encoder, &od_modify_password->node_name,
+                               &od_modify_password->db_path,
+                               &od_modify_password->instigator_token, msg->version);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
@@ -1688,14 +1606,7 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 es_event_od_disable_user_t *od_disable_user = event.od_disable_user;
                 if (!od_disable_user) break;
                 flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "instigator");
-                if (od_disable_user->instigator) {
-                    encode_es_process_t(encoder, od_disable_user->instigator);
-                } else {
-                    flb_log_event_encoder_append_body_null(encoder);
-                }
+                encode_od_instigator(encoder, od_disable_user->instigator);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("error_code"),
@@ -1704,22 +1615,9 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("user_name"),
                     FLB_LOG_EVENT_STRING_VALUE(od_disable_user->user_name.data, od_disable_user->user_name.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
-                    FLB_LOG_EVENT_STRING_VALUE(od_disable_user->node_name.data, od_disable_user->node_name.length));
-                if(od_disable_user->db_path.length > 0) {
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("db_path"),
-                        FLB_LOG_EVENT_STRING_VALUE(od_disable_user->db_path.data, od_disable_user->db_path.length));
-                }
-                if (msg->version >= 8) {
-                  flb_log_event_encoder_append_body_cstring(
-                      encoder,
-                      "instigator_token");
-                  encode_audit_token_t(encoder, &od_disable_user->instigator_token);
-                }
+                encode_od_tail(encoder, &od_disable_user->node_name,
+                               &od_disable_user->db_path,
+                               &od_disable_user->instigator_token, msg->version);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
@@ -1727,14 +1625,7 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 es_event_od_enable_user_t *od_enable_user = event.od_enable_user;
                 if (!od_enable_user) break;
                 flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "instigator");
-                if (od_enable_user->instigator) {
-                    encode_es_process_t(encoder, od_enable_user->instigator);
-                } else {
-                    flb_log_event_encoder_append_body_null(encoder);
-                }
+                encode_od_instigator(encoder, od_enable_user->instigator);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("error_code"),
@@ -1743,22 +1634,9 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("user_name"),
                     FLB_LOG_EVENT_STRING_VALUE(od_enable_user->user_name.data, od_enable_user->user_name.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
-                    FLB_LOG_EVENT_STRING_VALUE(od_enable_user->node_name.data, od_enable_user->node_name.length));
-                if(od_enable_user->db_path.length > 0) {
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("db_path"),
-                        FLB_LOG_EVENT_STRING_VALUE(od_enable_user->db_path.data, od_enable_user->db_path.length));
-                }
-                if (msg->version >= 8) {
-                  flb_log_event_encoder_append_body_cstring(
-                      encoder,
-                      "instigator_token");
-                  encode_audit_token_t(encoder, &od_enable_user->instigator_token);
-                }
+                encode_od_tail(encoder, &od_enable_user->node_name,
+                               &od_enable_user->db_path,
+                               &od_enable_user->instigator_token, msg->version);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
@@ -1766,14 +1644,7 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 es_event_od_attribute_value_add_t *od_attribute_value_add = event.od_attribute_value_add;
                 if (!od_attribute_value_add) break;
                 flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "instigator");
-                if (od_attribute_value_add->instigator) {
-                    encode_es_process_t(encoder, od_attribute_value_add->instigator);
-                } else {
-                    flb_log_event_encoder_append_body_null(encoder);
-                }
+                encode_od_instigator(encoder, od_attribute_value_add->instigator);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("error_code"),
@@ -1794,22 +1665,9 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("attribute_value"),
                     FLB_LOG_EVENT_STRING_VALUE(od_attribute_value_add->attribute_value.data, od_attribute_value_add->attribute_value.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
-                    FLB_LOG_EVENT_STRING_VALUE(od_attribute_value_add->node_name.data, od_attribute_value_add->node_name.length));
-                if(od_attribute_value_add->db_path.length > 0) {
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("db_path"),
-                        FLB_LOG_EVENT_STRING_VALUE(od_attribute_value_add->db_path.data, od_attribute_value_add->db_path.length));
-                }
-                if (msg->version >= 8) {
-                  flb_log_event_encoder_append_body_cstring(
-                      encoder,
-                      "instigator_token");
-                  encode_audit_token_t(encoder, &od_attribute_value_add->instigator_token);
-                }
+                encode_od_tail(encoder, &od_attribute_value_add->node_name,
+                               &od_attribute_value_add->db_path,
+                               &od_attribute_value_add->instigator_token, msg->version);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
@@ -1817,14 +1675,7 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 es_event_od_attribute_value_remove_t *od_attribute_value_remove = event.od_attribute_value_remove;
                 if (!od_attribute_value_remove) break;
                 flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "instigator");
-                if (od_attribute_value_remove->instigator) {
-                    encode_es_process_t(encoder, od_attribute_value_remove->instigator);
-                } else {
-                    flb_log_event_encoder_append_body_null(encoder);
-                }
+                encode_od_instigator(encoder, od_attribute_value_remove->instigator);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("error_code"),
@@ -1845,22 +1696,9 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("attribute_value"),
                     FLB_LOG_EVENT_STRING_VALUE(od_attribute_value_remove->attribute_value.data, od_attribute_value_remove->attribute_value.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
-                    FLB_LOG_EVENT_STRING_VALUE(od_attribute_value_remove->node_name.data, od_attribute_value_remove->node_name.length));
-                if(od_attribute_value_remove->db_path.length > 0) {
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("db_path"),
-                        FLB_LOG_EVENT_STRING_VALUE(od_attribute_value_remove->db_path.data, od_attribute_value_remove->db_path.length));
-                }
-                if (msg->version >= 8) {
-                  flb_log_event_encoder_append_body_cstring(
-                      encoder,
-                      "instigator_token");
-                  encode_audit_token_t(encoder, &od_attribute_value_remove->instigator_token);
-                }
+                encode_od_tail(encoder, &od_attribute_value_remove->node_name,
+                               &od_attribute_value_remove->db_path,
+                               &od_attribute_value_remove->instigator_token, msg->version);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
@@ -1868,14 +1706,7 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 es_event_od_attribute_set_t *od_attribute_set = event.od_attribute_set;
                 if (!od_attribute_set) break;
                 flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "instigator");
-                if (od_attribute_set->instigator) {
-                    encode_es_process_t(encoder, od_attribute_set->instigator);
-                } else {
-                    flb_log_event_encoder_append_body_null(encoder);
-                }
+                encode_od_instigator(encoder, od_attribute_set->instigator);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("error_code"),
@@ -1896,32 +1727,18 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("attribute_value_count"),
                     FLB_LOG_EVENT_UINT64_VALUE(od_attribute_set->attribute_value_count));
-                flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "attribute_values");
+                flb_log_event_encoder_append_body_cstring(encoder, "attribute_values");
                 flb_log_event_encoder_body_begin_array(encoder);
-                for(size_t i = 0; i < od_attribute_set->attribute_value_count; i++) {
+                for (size_t i = 0; i < od_attribute_set->attribute_value_count; i++) {
                     flb_log_event_encoder_append_body_string(
                         encoder,
-                        (char *)od_attribute_set->attribute_values[i].data, od_attribute_set->attribute_values[i].length);
+                        (char *)od_attribute_set->attribute_values[i].data,
+                        od_attribute_set->attribute_values[i].length);
                 }
                 flb_log_event_encoder_body_commit_array(encoder);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
-                    FLB_LOG_EVENT_STRING_VALUE(od_attribute_set->node_name.data, od_attribute_set->node_name.length));
-                if(od_attribute_set->db_path.length > 0) {
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("db_path"),
-                        FLB_LOG_EVENT_STRING_VALUE(od_attribute_set->db_path.data, od_attribute_set->db_path.length));
-                }
-                if (msg->version >= 8) {
-                  flb_log_event_encoder_append_body_cstring(
-                      encoder,
-                      "instigator_token");
-                  encode_audit_token_t(encoder, &od_attribute_set->instigator_token);
-                }
+                encode_od_tail(encoder, &od_attribute_set->node_name,
+                               &od_attribute_set->db_path,
+                               &od_attribute_set->instigator_token, msg->version);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
@@ -1929,60 +1746,19 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 es_event_od_group_add_t *od_group_add = event.od_group_add;
                 if (!od_group_add) break;
                 flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "instigator");
-                if (od_group_add->instigator) {
-                    encode_es_process_t(encoder, od_group_add->instigator);
-                } else {
-                    flb_log_event_encoder_append_body_null(encoder);
-                }
+                encode_od_instigator(encoder, od_group_add->instigator);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("error_code"),
                     FLB_LOG_EVENT_INT32_VALUE(od_group_add->error_code));
-                flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "member");
-                flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("member_type"),
-                    FLB_LOG_EVENT_INT32_VALUE(od_group_add->member->member_type));
-                if (od_group_add->member->member_type == ES_OD_MEMBER_TYPE_USER_NAME) {
-                  flb_log_event_encoder_append_body_values(
-                      encoder,
-                      FLB_LOG_EVENT_CSTRING_VALUE("member_value"),
-                      FLB_LOG_EVENT_STRING_VALUE(od_group_add->member->member_value.name.data, od_group_add->member->member_value.name.length));
-                } else {
-                  uuid_string_t uuidstr;
-                  uuid_unparse(od_group_add->member->member_value.uuid, uuidstr);
-                  flb_log_event_encoder_append_body_values(
-                      encoder,
-                      FLB_LOG_EVENT_CSTRING_VALUE("member_value"),
-                      FLB_LOG_EVENT_CSTRING_VALUE(uuidstr));
-                }
-                flb_log_event_encoder_body_commit_map(encoder);
+                encode_od_member(encoder, od_group_add->member);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("group_name"),
                     FLB_LOG_EVENT_STRING_VALUE(od_group_add->group_name.data, od_group_add->group_name.length));
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
-                    FLB_LOG_EVENT_STRING_VALUE(od_group_add->node_name.data, od_group_add->node_name.length));
-                if(od_group_add->db_path.length > 0) {
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("db_path"),
-                        FLB_LOG_EVENT_STRING_VALUE(od_group_add->db_path.data, od_group_add->db_path.length));
-                }
-                if (msg->version >= 8) {
-                  flb_log_event_encoder_append_body_cstring(
-                      encoder,
-                      "instigator_token");
-                  encode_audit_token_t(encoder, &od_group_add->instigator_token);
-                }
+                encode_od_tail(encoder, &od_group_add->node_name,
+                               &od_group_add->db_path,
+                               &od_group_add->instigator_token, msg->version);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
@@ -1990,14 +1766,7 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 es_event_od_group_remove_t *od_group_remove = event.od_group_remove;
                 if (!od_group_remove) break;
                 flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "instigator");
-                if (od_group_remove->instigator) {
-                    encode_es_process_t(encoder, od_group_remove->instigator);
-                } else {
-                    flb_log_event_encoder_append_body_null(encoder);
-                }
+                encode_od_instigator(encoder, od_group_remove->instigator);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("error_code"),
@@ -2006,44 +1775,10 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("group_name"),
                     FLB_LOG_EVENT_STRING_VALUE(od_group_remove->group_name.data, od_group_remove->group_name.length));
-                flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "member");
-                flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("member_type"),
-                    FLB_LOG_EVENT_INT32_VALUE(od_group_remove->member->member_type));
-                if (od_group_remove->member->member_type == ES_OD_MEMBER_TYPE_USER_NAME) {
-                  flb_log_event_encoder_append_body_values(
-                      encoder,
-                      FLB_LOG_EVENT_CSTRING_VALUE("member_value"),
-                      FLB_LOG_EVENT_STRING_VALUE(od_group_remove->member->member_value.name.data, od_group_remove->member->member_value.name.length));
-                } else {
-                  uuid_string_t uuidstr;
-                  uuid_unparse(od_group_remove->member->member_value.uuid, uuidstr);
-                  flb_log_event_encoder_append_body_values(
-                      encoder,
-                      FLB_LOG_EVENT_CSTRING_VALUE("member_value"),
-                      FLB_LOG_EVENT_CSTRING_VALUE(uuidstr));
-                }
-                flb_log_event_encoder_body_commit_map(encoder);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
-                    FLB_LOG_EVENT_STRING_VALUE(od_group_remove->node_name.data, od_group_remove->node_name.length));
-                if(od_group_remove->db_path.length > 0) {
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("db_path"),
-                        FLB_LOG_EVENT_STRING_VALUE(od_group_remove->db_path.data, od_group_remove->db_path.length));
-                }
-                if (msg->version >= 8) {
-                  flb_log_event_encoder_append_body_cstring(
-                      encoder,
-                      "instigator_token");
-                  encode_audit_token_t(encoder, &od_group_remove->instigator_token);
-                }
+                encode_od_member(encoder, od_group_remove->member);
+                encode_od_tail(encoder, &od_group_remove->node_name,
+                               &od_group_remove->db_path,
+                               &od_group_remove->instigator_token, msg->version);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
@@ -2051,14 +1786,7 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 es_event_od_group_set_t *od_group_set = event.od_group_set;
                 if (!od_group_set) break;
                 flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "instigator");
-                if (od_group_set->instigator) {
-                    encode_es_process_t(encoder, od_group_set->instigator);
-                } else {
-                    flb_log_event_encoder_append_body_null(encoder);
-                }
+                encode_od_instigator(encoder, od_group_set->instigator);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("error_code"),
@@ -2067,50 +1795,10 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("group_name"),
                     FLB_LOG_EVENT_STRING_VALUE(od_group_set->group_name.data, od_group_set->group_name.length));
-                flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "members");
-                flb_log_event_encoder_body_begin_map(encoder);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("member_type"),
-                    FLB_LOG_EVENT_INT32_VALUE(od_group_set->members->member_type));
-                flb_log_event_encoder_append_body_cstring(
-                    encoder,
-                    "member_values");
-                flb_log_event_encoder_body_begin_array(encoder);
-                if (od_group_set->members->member_type == ES_OD_MEMBER_TYPE_USER_NAME) {
-                    for (size_t i = 0; i < od_group_set->members->member_count; i++) {
-                        flb_log_event_encoder_append_body_string(
-                            encoder,
-                            (char *)od_group_set->members->member_array.names[i].data,
-                            od_group_set->members->member_array.names[i].length);
-                    }
-                } else {
-                    for (size_t i = 0; i < od_group_set->members->member_count; i++) {
-                        uuid_string_t uuidstr;
-                        uuid_unparse(od_group_set->members->member_array.uuids[i], uuidstr);
-                        flb_log_event_encoder_append_body_cstring(encoder, uuidstr);
-                    }
-                }
-                flb_log_event_encoder_body_commit_array(encoder);
-                flb_log_event_encoder_body_commit_map(encoder);
-                flb_log_event_encoder_append_body_values(
-                    encoder,
-                    FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
-                    FLB_LOG_EVENT_STRING_VALUE(od_group_set->node_name.data, od_group_set->node_name.length));
-                if (od_group_set->db_path.length > 0) {
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("db_path"),
-                        FLB_LOG_EVENT_STRING_VALUE(od_group_set->db_path.data, od_group_set->db_path.length));
-                }
-                if (msg->version >= 8) {
-                    flb_log_event_encoder_append_body_cstring(
-                        encoder,
-                        "instigator_token");
-                    encode_audit_token_t(encoder, &od_group_set->instigator_token);
-                }
+                encode_od_members(encoder, od_group_set->members);
+                encode_od_tail(encoder, &od_group_set->node_name,
+                               &od_group_set->db_path,
+                               &od_group_set->instigator_token, msg->version);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
@@ -2128,12 +1816,7 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                     FLB_LOG_EVENT_INT32_VALUE(authentication->type));
                 switch(authentication->type) {
                     case ES_AUTHENTICATION_TYPE_OD:
-                      flb_log_event_encoder_append_body_cstring(encoder, "instigator");
-                      if (authentication->data.od->instigator) {
-                          encode_es_process_t(encoder, authentication->data.od->instigator);
-                      } else {
-                          flb_log_event_encoder_append_body_null(encoder);
-                      }
+                      encode_od_instigator(encoder, authentication->data.od->instigator);
                       flb_log_event_encoder_append_body_values(
                           encoder,
                           FLB_LOG_EVENT_CSTRING_VALUE("record_type"),
@@ -2142,22 +1825,9 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                           encoder,
                           FLB_LOG_EVENT_CSTRING_VALUE("record_name"),
                           FLB_LOG_EVENT_STRING_VALUE(authentication->data.od->record_name.data, authentication->data.od->record_name.length));
-                      flb_log_event_encoder_append_body_values(
-                          encoder,
-                          FLB_LOG_EVENT_CSTRING_VALUE("node_name"),
-                          FLB_LOG_EVENT_STRING_VALUE(authentication->data.od->node_name.data, authentication->data.od->node_name.length));
-                      if(authentication->data.od->db_path.length > 0) {
-                          flb_log_event_encoder_append_body_values(
-                              encoder,
-                              FLB_LOG_EVENT_CSTRING_VALUE("db_path"),
-                              FLB_LOG_EVENT_STRING_VALUE(authentication->data.od->db_path.data, authentication->data.od->db_path.length));
-                      }
-                      if (msg->version >= 8) {
-                          flb_log_event_encoder_append_body_cstring(
-                              encoder,
-                              "instigator_token");
-                          encode_audit_token_t(encoder, &authentication->data.od->instigator_token);
-                      }
+                      encode_od_tail(encoder, &authentication->data.od->node_name,
+                                     &authentication->data.od->db_path,
+                                     &authentication->data.od->instigator_token, msg->version);
                       break;
                     default:
                       break;

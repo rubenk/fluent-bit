@@ -5,8 +5,8 @@ This document tracks all improvements for the `in_maces` plugin, including compl
 **Quick Status:**
 - ✅ **P0 (Critical):** 4/4 complete
 - 🔄 **P1 (High Priority):** 4/5 complete (1 won't fix)
-- ⏳ **P2 (Medium Priority):** 4/11 complete
-- **Total commits:** 34
+- ⏳ **P2 (Medium Priority):** 5/11 complete
+- **Total commits:** 35
 
 ---
 
@@ -28,6 +28,7 @@ This document tracks all improvements for the `in_maces` plugin, including compl
 - ✅ Fixed magic numbers (use sizeof(es_cdhash_t))
 - ✅ Fixed inconsistent null check style (explicit null everywhere)
 - ✅ Fixed TODOs in code (dev_t major/minor)
+- ✅ Reduced OD events code duplication with helper functions
 
 ---
 
@@ -146,37 +147,19 @@ flb_log_event_encoder_reset(encoder);
 
 ## P2 (Medium Priority) Issues
 
-### 7. Massive Code Duplication in OD Events
+### 7. ~~Massive Code Duplication in OD Events~~ ✅ FIXED
 
-**Location:** Lines 1715-2318
+**Status:** ✅ Complete
 
-**Issue:** All OpenDirectory (OD) events have nearly identical structure (~30-40 lines each):
-- Instigator encoding (with null check)
-- Error code
-- Node name
-- DB path (with length check)
-- Instigator token (with version check)
+**What was implemented:**
+- Created `encode_od_instigator()` helper to encode instigator process or null
+- Created `encode_od_tail()` helper to encode node_name, db_path (conditional), and instigator_token (version check)
+- Created `encode_od_member()` helper for GROUP_ADD/GROUP_REMOVE member encoding
+- Created `encode_od_members()` helper for GROUP_SET members array encoding
+- Refactored all 13 OD events to use the helper functions
+- Also refactored AUTHENTICATION event's OD branch
 
-**Impact:**
-- ~600 lines of duplicated code
-- Harder to maintain
-- Inconsistent handling across events
-
-**Fix:** Create helper functions:
-```c
-static int encode_od_common_fields(
-    struct flb_log_event_encoder *encoder,
-    const char *node_name_data, size_t node_name_len,
-    const char *db_path_data, size_t db_path_len,
-    int error_code,
-    const audit_token_t *token
-);
-
-static int encode_od_instigator(
-    struct flb_log_event_encoder *encoder,
-    const es_process_t *instigator
-);
-```
+**Lines reduced:** 393 lines removed, 165 lines added (net reduction of 228 lines)
 
 ---
 

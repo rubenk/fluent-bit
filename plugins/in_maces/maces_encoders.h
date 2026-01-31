@@ -46,4 +46,19 @@ int encode_es_file_t(struct flb_log_event_encoder *encoder,
 int encode_es_process_t(struct flb_log_event_encoder *encoder,
                         const es_process_t *process);
 
+int encode_od_instigator(struct flb_log_event_encoder *encoder,
+                         const es_process_t *instigator);
+
+int encode_od_tail(struct flb_log_event_encoder *encoder,
+                   const es_string_token_t *node_name,
+                   const es_string_token_t *db_path,
+                   const audit_token_t *instigator_token,
+                   uint32_t msg_version);
+
+int encode_od_member(struct flb_log_event_encoder *encoder,
+                     const es_od_member_id_t *member);
+
+int encode_od_members(struct flb_log_event_encoder *encoder,
+                      const es_od_member_id_array_t *members);
+
 #endif /* FLB_IN_MACES_ENCODERS_H */
