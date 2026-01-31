@@ -906,18 +906,20 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_SETATTRLIST:
+            case ES_EVENT_TYPE_NOTIFY_SETATTRLIST: {
+                es_event_setattrlist_t *setattrlist = &event.setattrlist;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
                     "attrlist");
-                encode_attrlist(encoder, &event.setattrlist.attrlist);
+                encode_attrlist(encoder, &setattrlist->attrlist);
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
                     "target");
-                encode_es_file_t(encoder, event.setattrlist.target);
+                encode_es_file_t(encoder, setattrlist->target);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_SEARCHFS:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
