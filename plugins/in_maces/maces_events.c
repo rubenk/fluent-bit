@@ -102,14 +102,16 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_FORK:
+            case ES_EVENT_TYPE_NOTIFY_FORK: {
+                es_event_fork_t *fork = &event.fork;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
                     "child");
-                encode_es_process_t(encoder, event.fork.child);
+                encode_es_process_t(encoder, fork->child);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_EXIT:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
