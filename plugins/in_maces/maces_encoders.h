@@ -46,6 +46,10 @@ int encode_es_file_t(struct flb_log_event_encoder *encoder,
 int encode_es_process_t(struct flb_log_event_encoder *encoder,
                         const es_process_t *process);
 
+int encode_uuid(struct flb_log_event_encoder *encoder,
+                const char *field_name,
+                const uuid_t uuid);
+
 int encode_od_instigator(struct flb_log_event_encoder *encoder,
                          const es_process_t *instigator);
 

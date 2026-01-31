@@ -5,8 +5,8 @@ This document tracks all improvements for the `in_maces` plugin, including compl
 **Quick Status:**
 - ✅ **P0 (Critical):** 4/4 complete
 - 🔄 **P1 (High Priority):** 4/5 complete (1 won't fix)
-- ⏳ **P2 (Medium Priority):** 5/11 complete
-- **Total commits:** 35
+- ⏳ **P2 (Medium Priority):** 6/11 complete
+- **Total commits:** 36
 
 ---
 
@@ -29,6 +29,7 @@ This document tracks all improvements for the `in_maces` plugin, including compl
 - ✅ Fixed inconsistent null check style (explicit null everywhere)
 - ✅ Fixed TODOs in code (dev_t major/minor)
 - ✅ Reduced OD events code duplication with helper functions
+- ✅ Created encode_uuid() helper for UUID encoding
 
 ---
 
@@ -163,28 +164,16 @@ flb_log_event_encoder_reset(encoder);
 
 ---
 
-### 8. Duplicate UUID Encoding
+### 8. ~~Duplicate UUID Encoding~~ ✅ FIXED
 
-**Location:** Lines 2159, 2223, 2290
+**Status:** ✅ Complete
 
-**Issue:** UUID encoding is duplicated 3+ times:
-```c
-uuid_string_t uuidstr;
-uuid_unparse(member_uuid, uuidstr);
-flb_log_event_encoder_append_body_values(
-    encoder,
-    FLB_LOG_EVENT_CSTRING_VALUE("member_uuid"),
-    FLB_LOG_EVENT_CSTRING_VALUE(uuidstr));
-```
-
-**Fix:** Create helper function:
-```c
-static int encode_uuid(
-    struct flb_log_event_encoder *encoder,
-    const char *field_name,
-    const uuid_t uuid
-);
-```
+**What was implemented:**
+- Created `encode_uuid()` helper function that handles both:
+  - Field-value encoding (when field_name is provided)
+  - Array element encoding (when field_name is NULL)
+- Updated `encode_od_member()` and `encode_od_members()` to use it
+- All UUID encoding now goes through a single helper function
 
 ---
 

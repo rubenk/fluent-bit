@@ -291,6 +291,21 @@ int encode_es_file_t(struct flb_log_event_encoder *encoder, const es_file_t *fil
     return 0;
 }
 
+int encode_uuid(struct flb_log_event_encoder *encoder,
+                const char *field_name,
+                const uuid_t uuid) {
+    uuid_string_t uuidstr;
+    uuid_unparse(uuid, uuidstr);
+    if (field_name) {
+        return flb_log_event_encoder_append_body_values(
+            encoder,
+            FLB_LOG_EVENT_CSTRING_VALUE(field_name),
+            FLB_LOG_EVENT_CSTRING_VALUE(uuidstr));
+    } else {
+        return flb_log_event_encoder_append_body_cstring(encoder, uuidstr);
+    }
+}
+
 int encode_od_instigator(struct flb_log_event_encoder *encoder,
                          const es_process_t *instigator) {
     flb_log_event_encoder_append_body_cstring(encoder, "instigator");
@@ -338,12 +353,7 @@ int encode_od_member(struct flb_log_event_encoder *encoder,
             FLB_LOG_EVENT_STRING_VALUE(member->member_value.name.data,
                                        member->member_value.name.length));
     } else {
-        uuid_string_t uuidstr;
-        uuid_unparse(member->member_value.uuid, uuidstr);
-        flb_log_event_encoder_append_body_values(
-            encoder,
-            FLB_LOG_EVENT_CSTRING_VALUE("member_value"),
-            FLB_LOG_EVENT_CSTRING_VALUE(uuidstr));
+        encode_uuid(encoder, "member_value", member->member_value.uuid);
     }
     flb_log_event_encoder_body_commit_map(encoder);
     return 0;
@@ -368,9 +378,7 @@ int encode_od_members(struct flb_log_event_encoder *encoder,
         }
     } else {
         for (size_t i = 0; i < members->member_count; i++) {
-            uuid_string_t uuidstr;
-            uuid_unparse(members->member_array.uuids[i], uuidstr);
-            flb_log_event_encoder_append_body_cstring(encoder, uuidstr);
+            encode_uuid(encoder, NULL, members->member_array.uuids[i]);
         }
     }
     flb_log_event_encoder_body_commit_array(encoder);
