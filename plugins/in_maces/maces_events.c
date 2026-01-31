@@ -934,18 +934,20 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_UTIMES:
+            case ES_EVENT_TYPE_NOTIFY_UTIMES: {
+                es_event_utimes_t *utimes = &event.utimes;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(encoder, "atime");
-                encode_timespec(encoder, &event.utimes.atime);
+                encode_timespec(encoder, &utimes->atime);
                 flb_log_event_encoder_append_body_cstring(encoder, "mtime");
-                encode_timespec(encoder, &event.utimes.mtime);
+                encode_timespec(encoder, &utimes->mtime);
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
                     "target");
-                encode_es_file_t(encoder, event.utimes.target);
+                encode_es_file_t(encoder, utimes->target);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_LW_SESSION_LOGIN:
                 if (event.lw_session_login) {
                     flb_log_event_encoder_body_begin_map(encoder);
