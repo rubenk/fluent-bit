@@ -1231,43 +1231,44 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_ADD:
-                if (event.btm_launch_item_add) {
-                    flb_log_event_encoder_body_begin_map(encoder);
-                    flb_log_event_encoder_append_body_cstring(encoder, "instigator");
-                    if (event.btm_launch_item_add->instigator) {
-                        encode_es_process_t(encoder, event.btm_launch_item_add->instigator);
-                    } else {
-                        flb_log_event_encoder_append_body_null(encoder);
-                    }
-                    flb_log_event_encoder_append_body_cstring(encoder, "app");
-                    if (event.btm_launch_item_add->app) {
-                        encode_es_process_t(encoder, event.btm_launch_item_add->app);
-                    } else {
-                        flb_log_event_encoder_append_body_null(encoder);
-                    }
-                    encode_btm_launch_item_t(encoder, event.btm_launch_item_add->item);
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("executable_path"),
-                        FLB_LOG_EVENT_STRING_VALUE(event.btm_launch_item_add->executable_path.data, event.btm_launch_item_add->executable_path.length));
-                    if (msg->version >= 8) {
-                        flb_log_event_encoder_append_body_cstring(encoder, "instigator_token");
-                        if (event.btm_launch_item_add->instigator_token) {
-                            encode_audit_token_t(encoder, event.btm_launch_item_add->instigator_token);
-                        } else {
-                            flb_log_event_encoder_append_body_null(encoder);
-                        }
-                        flb_log_event_encoder_append_body_cstring(encoder, "app_token");
-                        if (event.btm_launch_item_add->app_token) {
-                            encode_audit_token_t(encoder, event.btm_launch_item_add->app_token);
-                        } else {
-                            flb_log_event_encoder_append_body_null(encoder);
-                        }
-                    }
-                    flb_log_event_encoder_body_commit_map(encoder);
+            case ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_ADD: {
+                es_event_btm_launch_item_add_t *btm_launch_item_add = event.btm_launch_item_add;
+                if (btm_launch_item_add == NULL) break;
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_cstring(encoder, "instigator");
+                if (btm_launch_item_add->instigator != NULL) {
+                    encode_es_process_t(encoder, btm_launch_item_add->instigator);
+                } else {
+                    flb_log_event_encoder_append_body_null(encoder);
                 }
+                flb_log_event_encoder_append_body_cstring(encoder, "app");
+                if (btm_launch_item_add->app != NULL) {
+                    encode_es_process_t(encoder, btm_launch_item_add->app);
+                } else {
+                    flb_log_event_encoder_append_body_null(encoder);
+                }
+                encode_btm_launch_item_t(encoder, btm_launch_item_add->item);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("executable_path"),
+                    FLB_LOG_EVENT_STRING_VALUE(btm_launch_item_add->executable_path.data, btm_launch_item_add->executable_path.length));
+                if (msg->version >= 8) {
+                    flb_log_event_encoder_append_body_cstring(encoder, "instigator_token");
+                    if (btm_launch_item_add->instigator_token != NULL) {
+                        encode_audit_token_t(encoder, btm_launch_item_add->instigator_token);
+                    } else {
+                        flb_log_event_encoder_append_body_null(encoder);
+                    }
+                    flb_log_event_encoder_append_body_cstring(encoder, "app_token");
+                    if (btm_launch_item_add->app_token != NULL) {
+                        encode_audit_token_t(encoder, btm_launch_item_add->app_token);
+                    } else {
+                        flb_log_event_encoder_append_body_null(encoder);
+                    }
+                }
+                flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_REMOVE:
                 if (event.btm_launch_item_remove) {
                     flb_log_event_encoder_body_begin_map(encoder);
