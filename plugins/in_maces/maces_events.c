@@ -88,18 +88,20 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
         // event specific code
         if (ret == FLB_EVENT_ENCODER_SUCCESS) {
             switch (msg->event_type) {
-            case ES_EVENT_TYPE_NOTIFY_EXEC:
+            case ES_EVENT_TYPE_NOTIFY_EXEC: {
+                es_event_exec_t *exec = &event.exec;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("dyld_exec_path"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.exec.dyld_exec_path.data, event.exec.dyld_exec_path.length));
+                    FLB_LOG_EVENT_STRING_VALUE(exec->dyld_exec_path.data, exec->dyld_exec_path.length));
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
                     "target");
-                encode_es_process_t(encoder, event.exec.target);
+                encode_es_process_t(encoder, exec->target);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_FORK:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
