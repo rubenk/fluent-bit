@@ -5,7 +5,7 @@ This document tracks all improvements for the `in_maces` plugin, including compl
 **Quick Status:**
 - ✅ **P0 (Critical):** 4/4 complete
 - 🔄 **P1 (High Priority):** 4/5 complete (1 won't fix)
-- ⏳ **P2 (Medium Priority):** 3/10 complete
+- ⏳ **P2 (Medium Priority):** 4/11 complete
 - **Total commits:** 34
 
 ---
@@ -405,7 +405,35 @@ static int encode_timespec(struct flb_log_event_encoder *encoder,
 
 ---
 
-### 16. FLB_MINIMAL Build Broken
+### 16. ~~Unimplemented Event Types~~ ✅ FIXED
+
+**Status:** ✅ Complete
+
+**What was implemented:**
+Added case handlers for all 14 previously unimplemented event types in `maces_events.c`:
+
+| Event Type | macOS Version | Description |
+|------------|---------------|-------------|
+| `SETTIME` | 10.15.4 | System time modification (empty map - no data fields) |
+| `SETACL` | 10.15.4 | File ACL modification (target, set_or_clear, acl text) |
+| `PROC_CHECK` | 10.15.4 | Process check/inspection (target, type, flavor) |
+| `PROC_SUSPEND_RESUME` | 11.0 | Process suspend/resume (target, type) |
+| `CS_INVALIDATED` | 11.0 | Code signature invalidated (empty map - no data fields) |
+| `REMOTE_THREAD_CREATE` | 11.0 | Remote thread injection (target, thread_state) |
+| `XP_MALWARE_DETECTED` | 12.0 | XProtect malware detection (signature_version, malware_identifier, incident_identifier, detected_path, detected_executable) |
+| `XP_MALWARE_REMEDIATED` | 12.0 | XProtect malware remediation (signature_version, malware_identifier, incident_identifier, action_type, success, result_description, remediated_path, remediated_process_audit_token) |
+| `PROFILE_ADD` | 13.0 | Configuration profile added (instigator, is_update, profile details, instigator_token) |
+| `PROFILE_REMOVE` | 13.0 | Configuration profile removed (instigator, profile details, instigator_token) |
+| `AUTHORIZATION_PETITION` | 13.0 | Authorization request (instigator, petitioner, flags, rights array, tokens) |
+| `AUTHORIZATION_JUDGEMENT` | 13.0 | Authorization decision (instigator, petitioner, return_code, results array with right_name/rule_class/granted, tokens) |
+| `GATEKEEPER_USER_OVERRIDE` | 15.0 | Gatekeeper bypass by user (file_type, file/file_path, sha256, signing_info with cdhash/signing_id/team_id) |
+| `TCC_MODIFY` | 15.4 | TCC database modification (service, identity, identity_type, update_type, instigator_token, instigator, responsible_token, responsible, right, reason) |
+
+All 14 events now have proper case handlers with full field encoding.
+
+---
+
+### 17. FLB_MINIMAL Build Broken
 
 **Location:** Fluent Bit cmake configuration
 
@@ -453,7 +481,7 @@ The monkey library headers are generated during cmake but the include paths aren
 |----------|-------|----------|-----------|-----------|--------|
 | P0 (Critical) | 4 | 4 ✅ | 0 | 0 | Complete |
 | P1 (High) | 6 | 4 ✅ | 1 ❌ | 1 | Nearly done |
-| P2 (Medium) | 10 | 3 ✅ | 0 | 7 | In progress |
+| P2 (Medium) | 11 | 4 ✅ | 0 | 7 | In progress |
 
 ### Recommended Order
 
