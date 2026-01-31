@@ -423,24 +423,26 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_SIGNAL:
+            case ES_EVENT_TYPE_NOTIFY_SIGNAL: {
+                es_event_signal_t *signal = &event.signal;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("sig"),
-                    FLB_LOG_EVENT_INT32_VALUE(event.signal.sig));
+                    FLB_LOG_EVENT_INT32_VALUE(signal->sig));
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
                     "target");
-                encode_es_process_t(encoder, event.signal.target);
+                encode_es_process_t(encoder, signal->target);
                 flb_log_event_encoder_append_body_cstring(encoder, "instigator");
-                if (event.signal.instigator) {
-                    encode_es_process_t(encoder, event.signal.instigator);
+                if (signal->instigator != NULL) {
+                    encode_es_process_t(encoder, signal->instigator);
                 } else {
                     flb_log_event_encoder_append_body_null(encoder);
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_LISTEXTATTR:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
