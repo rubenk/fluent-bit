@@ -1219,16 +1219,18 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_PTY_CLOSE:
+            case ES_EVENT_TYPE_NOTIFY_PTY_CLOSE: {
+                es_event_pty_close_t *pty_close = &event.pty_close;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("dev_major"),
-                    FLB_LOG_EVENT_INT32_VALUE(major(event.pty_close.dev)),
+                    FLB_LOG_EVENT_INT32_VALUE(major(pty_close->dev)),
                     FLB_LOG_EVENT_CSTRING_VALUE("dev_minor"),
-                    FLB_LOG_EVENT_INT32_VALUE(minor(event.pty_close.dev)));
+                    FLB_LOG_EVENT_INT32_VALUE(minor(pty_close->dev)));
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_ADD:
                 if (event.btm_launch_item_add) {
                     flb_log_event_encoder_body_begin_map(encoder);
