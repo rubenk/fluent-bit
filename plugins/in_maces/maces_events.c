@@ -1123,28 +1123,29 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_OPENSSH_LOGOUT:
-                if (event.openssh_logout) {
-                    flb_log_event_encoder_body_begin_map(encoder);
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("source_address_type"),
-                        FLB_LOG_EVENT_INT32_VALUE(event.openssh_logout->source_address_type));
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("source_address"),
-                        FLB_LOG_EVENT_STRING_VALUE(event.openssh_logout->source_address.data, event.openssh_logout->source_address.length));
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("username"),
-                        FLB_LOG_EVENT_STRING_VALUE(event.openssh_logout->username.data, event.openssh_logout->username.length));
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("uid"),
-                        FLB_LOG_EVENT_UINT32_VALUE(event.openssh_logout->uid));
-                    flb_log_event_encoder_body_commit_map(encoder);
-                }
+            case ES_EVENT_TYPE_NOTIFY_OPENSSH_LOGOUT: {
+                es_event_openssh_logout_t *openssh_logout = event.openssh_logout;
+                if (openssh_logout == NULL) break;
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("source_address_type"),
+                    FLB_LOG_EVENT_INT32_VALUE(openssh_logout->source_address_type));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("source_address"),
+                    FLB_LOG_EVENT_STRING_VALUE(openssh_logout->source_address.data, openssh_logout->source_address.length));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("username"),
+                    FLB_LOG_EVENT_STRING_VALUE(openssh_logout->username.data, openssh_logout->username.length));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("uid"),
+                    FLB_LOG_EVENT_UINT32_VALUE(openssh_logout->uid));
+                flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_LOGIN_LOGIN:
                 if (event.login_login) {
                     flb_log_event_encoder_body_begin_map(encoder);
