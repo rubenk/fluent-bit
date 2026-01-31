@@ -1313,14 +1313,16 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_SETGID:
+            case ES_EVENT_TYPE_NOTIFY_SETGID: {
+                es_event_setgid_t *setgid = &event.setgid;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("gid"),
-                    FLB_LOG_EVENT_UINT32_VALUE(event.setgid.gid));
+                    FLB_LOG_EVENT_UINT32_VALUE(setgid->gid));
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_SETEUID:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
