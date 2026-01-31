@@ -693,14 +693,16 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_KEXTUNLOAD:
+            case ES_EVENT_TYPE_NOTIFY_KEXTUNLOAD: {
+                es_event_kextunload_t *kextunload = &event.kextunload;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("identifier"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.kextunload.identifier.data, event.kextunload.identifier.length));
+                    FLB_LOG_EVENT_STRING_VALUE(kextunload->identifier.data, kextunload->identifier.length));
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_SETMODE:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
