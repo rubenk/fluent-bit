@@ -862,14 +862,16 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_UNMOUNT:
+            case ES_EVENT_TYPE_NOTIFY_UNMOUNT: {
+                es_event_unmount_t *unmount = &event.unmount;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
                     "statfs");
-                encode_statfs(encoder, event.unmount.statfs);
+                encode_statfs(encoder, unmount->statfs);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_REMOUNT:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
