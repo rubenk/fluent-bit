@@ -2104,6 +2104,23 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_REMOTE_THREAD_CREATE:
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_cstring(encoder, "target");
+                encode_es_process_t(encoder, event.remote_thread_create.target);
+                flb_log_event_encoder_append_body_cstring(encoder, "thread_state");
+                if (event.remote_thread_create.thread_state) {
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("flavor"),
+                        FLB_LOG_EVENT_INT32_VALUE(event.remote_thread_create.thread_state->flavor));
+                    flb_log_event_encoder_body_commit_map(encoder);
+                } else {
+                    flb_log_event_encoder_append_body_null(encoder);
+                }
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
