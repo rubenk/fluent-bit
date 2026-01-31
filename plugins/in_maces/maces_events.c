@@ -1357,18 +1357,20 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_SETREGID:
+            case ES_EVENT_TYPE_NOTIFY_SETREGID: {
+                es_event_setregid_t *setregid = &event.setregid;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("rgid"),
-                    FLB_LOG_EVENT_UINT32_VALUE(event.setregid.rgid));
+                    FLB_LOG_EVENT_UINT32_VALUE(setregid->rgid));
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("egid"),
-                    FLB_LOG_EVENT_UINT32_VALUE(event.setregid.egid));
+                    FLB_LOG_EVENT_UINT32_VALUE(setregid->egid));
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_SU:
                 if (event.su) {
                     flb_log_event_encoder_body_begin_map(encoder);
