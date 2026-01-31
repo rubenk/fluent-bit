@@ -347,22 +347,23 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_RENAME:
+            case ES_EVENT_TYPE_NOTIFY_RENAME: {
+                es_event_rename_t *rename = &event.rename;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
                     "source");
-                encode_es_file_t(encoder, event.rename.source);
+                encode_es_file_t(encoder, rename->source);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("destination_type"),
-                    FLB_LOG_EVENT_INT32_VALUE(event.rename.destination_type));
-                if (event.rename.destination_type == ES_DESTINATION_TYPE_EXISTING_FILE) {
+                    FLB_LOG_EVENT_INT32_VALUE(rename->destination_type));
+                if (rename->destination_type == ES_DESTINATION_TYPE_EXISTING_FILE) {
                     flb_log_event_encoder_append_body_cstring(
                         encoder,
                         "existing_file");
-                    encode_es_file_t(encoder, event.rename.destination.existing_file);
-                } else if (event.rename.destination_type == ES_DESTINATION_TYPE_NEW_PATH) {
+                    encode_es_file_t(encoder, rename->destination.existing_file);
+                } else if (rename->destination_type == ES_DESTINATION_TYPE_NEW_PATH) {
                     flb_log_event_encoder_append_body_cstring(
                         encoder,
                         "new_path");
@@ -370,15 +371,16 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                     flb_log_event_encoder_append_body_values(
                         encoder,
                         FLB_LOG_EVENT_CSTRING_VALUE("filename"),
-                        FLB_LOG_EVENT_STRING_VALUE(event.rename.destination.new_path.filename.data, event.rename.destination.new_path.filename.length));
+                        FLB_LOG_EVENT_STRING_VALUE(rename->destination.new_path.filename.data, rename->destination.new_path.filename.length));
                     flb_log_event_encoder_append_body_cstring(
                         encoder,
                         "dir");
-                    encode_es_file_t(encoder, event.rename.destination.new_path.dir);
+                    encode_es_file_t(encoder, rename->destination.new_path.dir);
                     flb_log_event_encoder_body_commit_map(encoder);
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_UNLINK:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
