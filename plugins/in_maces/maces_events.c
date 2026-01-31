@@ -249,30 +249,32 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_MMAP:
+            case ES_EVENT_TYPE_NOTIFY_MMAP: {
+                es_event_mmap_t *mmap = &event.mmap;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("max_protection"),
-                    FLB_LOG_EVENT_INT32_VALUE(event.mmap.max_protection));
+                    FLB_LOG_EVENT_INT32_VALUE(mmap->max_protection));
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("protection"),
-                    FLB_LOG_EVENT_INT32_VALUE(event.mmap.protection));
+                    FLB_LOG_EVENT_INT32_VALUE(mmap->protection));
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("flags"),
-                    FLB_LOG_EVENT_INT32_VALUE(event.mmap.flags));
+                    FLB_LOG_EVENT_INT32_VALUE(mmap->flags));
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("file_pos"),
-                    FLB_LOG_EVENT_UINT64_VALUE(event.mmap.file_pos));
+                    FLB_LOG_EVENT_UINT64_VALUE(mmap->file_pos));
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
                     "source");
-                encode_es_file_t(encoder, event.mmap.source);
+                encode_es_file_t(encoder, mmap->source);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_MPROTECT:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
