@@ -2155,54 +2155,55 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_XP_MALWARE_REMEDIATED:
-                if (event.xp_malware_remediated) {
-                    flb_log_event_encoder_body_begin_map(encoder);
+            case ES_EVENT_TYPE_NOTIFY_XP_MALWARE_REMEDIATED: {
+                es_event_xp_malware_remediated_t *xp = event.xp_malware_remediated;
+                if (!xp) break;
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("signature_version"),
+                    FLB_LOG_EVENT_STRING_VALUE(xp->signature_version.data,
+                                               xp->signature_version.length));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("malware_identifier"),
+                    FLB_LOG_EVENT_STRING_VALUE(xp->malware_identifier.data,
+                                               xp->malware_identifier.length));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("incident_identifier"),
+                    FLB_LOG_EVENT_STRING_VALUE(xp->incident_identifier.data,
+                                               xp->incident_identifier.length));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("action_type"),
+                    FLB_LOG_EVENT_STRING_VALUE(xp->action_type.data,
+                                               xp->action_type.length));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("success"),
+                    FLB_LOG_EVENT_BOOLEAN_VALUE(xp->success));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("result_description"),
+                    FLB_LOG_EVENT_STRING_VALUE(xp->result_description.data,
+                                               xp->result_description.length));
+                if (xp->remediated_path.length > 0) {
                     flb_log_event_encoder_append_body_values(
                         encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("signature_version"),
-                        FLB_LOG_EVENT_STRING_VALUE(event.xp_malware_remediated->signature_version.data,
-                                                   event.xp_malware_remediated->signature_version.length));
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("malware_identifier"),
-                        FLB_LOG_EVENT_STRING_VALUE(event.xp_malware_remediated->malware_identifier.data,
-                                                   event.xp_malware_remediated->malware_identifier.length));
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("incident_identifier"),
-                        FLB_LOG_EVENT_STRING_VALUE(event.xp_malware_remediated->incident_identifier.data,
-                                                   event.xp_malware_remediated->incident_identifier.length));
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("action_type"),
-                        FLB_LOG_EVENT_STRING_VALUE(event.xp_malware_remediated->action_type.data,
-                                                   event.xp_malware_remediated->action_type.length));
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("success"),
-                        FLB_LOG_EVENT_BOOLEAN_VALUE(event.xp_malware_remediated->success));
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("result_description"),
-                        FLB_LOG_EVENT_STRING_VALUE(event.xp_malware_remediated->result_description.data,
-                                                   event.xp_malware_remediated->result_description.length));
-                    if (event.xp_malware_remediated->remediated_path.length > 0) {
-                        flb_log_event_encoder_append_body_values(
-                            encoder,
-                            FLB_LOG_EVENT_CSTRING_VALUE("remediated_path"),
-                            FLB_LOG_EVENT_STRING_VALUE(event.xp_malware_remediated->remediated_path.data,
-                                                       event.xp_malware_remediated->remediated_path.length));
-                    }
-                    flb_log_event_encoder_append_body_cstring(encoder, "remediated_process_audit_token");
-                    if (event.xp_malware_remediated->remediated_process_audit_token) {
-                        encode_audit_token_t(encoder, event.xp_malware_remediated->remediated_process_audit_token);
-                    } else {
-                        flb_log_event_encoder_append_body_null(encoder);
-                    }
-                    flb_log_event_encoder_body_commit_map(encoder);
+                        FLB_LOG_EVENT_CSTRING_VALUE("remediated_path"),
+                        FLB_LOG_EVENT_STRING_VALUE(xp->remediated_path.data,
+                                                   xp->remediated_path.length));
                 }
+                flb_log_event_encoder_append_body_cstring(encoder, "remediated_process_audit_token");
+                if (xp->remediated_process_audit_token) {
+                    encode_audit_token_t(encoder, xp->remediated_process_audit_token);
+                } else {
+                    flb_log_event_encoder_append_body_null(encoder);
+                }
+                flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_PROFILE_ADD:
                 if (event.profile_add) {
                     flb_log_event_encoder_body_begin_map(encoder);
