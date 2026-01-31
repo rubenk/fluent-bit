@@ -2202,6 +2202,53 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                     flb_log_event_encoder_body_commit_map(encoder);
                 }
                 break;
+            case ES_EVENT_TYPE_NOTIFY_PROFILE_ADD:
+                if (event.profile_add) {
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_cstring(encoder, "instigator");
+                    if (event.profile_add->instigator) {
+                        encode_es_process_t(encoder, event.profile_add->instigator);
+                    } else {
+                        flb_log_event_encoder_append_body_null(encoder);
+                    }
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("is_update"),
+                        FLB_LOG_EVENT_BOOLEAN_VALUE(event.profile_add->is_update));
+                    flb_log_event_encoder_append_body_cstring(encoder, "profile");
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("uuid"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.profile_add->profile->uuid.data,
+                                                   event.profile_add->profile->uuid.length));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("install_source"),
+                        FLB_LOG_EVENT_INT32_VALUE(event.profile_add->profile->install_source));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("organization"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.profile_add->profile->organization.data,
+                                                   event.profile_add->profile->organization.length));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("display_name"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.profile_add->profile->display_name.data,
+                                                   event.profile_add->profile->display_name.length));
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("scope"),
+                        FLB_LOG_EVENT_STRING_VALUE(event.profile_add->profile->scope.data,
+                                                   event.profile_add->profile->scope.length));
+                    flb_log_event_encoder_body_commit_map(encoder);
+                    if (msg->version >= 8) {
+                        flb_log_event_encoder_append_body_cstring(encoder, "instigator_token");
+                        encode_audit_token_t(encoder, &event.profile_add->instigator_token);
+                    }
+                    flb_log_event_encoder_body_commit_map(encoder);
+                }
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
