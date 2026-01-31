@@ -2110,23 +2110,25 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
-            case ES_EVENT_TYPE_NOTIFY_REMOTE_THREAD_CREATE:
+            case ES_EVENT_TYPE_NOTIFY_REMOTE_THREAD_CREATE: {
+                es_event_remote_thread_create_t *rtc = &event.remote_thread_create;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(encoder, "target");
-                encode_es_process_t(encoder, event.remote_thread_create.target);
+                encode_es_process_t(encoder, rtc->target);
                 flb_log_event_encoder_append_body_cstring(encoder, "thread_state");
-                if (event.remote_thread_create.thread_state) {
+                if (rtc->thread_state) {
                     flb_log_event_encoder_body_begin_map(encoder);
                     flb_log_event_encoder_append_body_values(
                         encoder,
                         FLB_LOG_EVENT_CSTRING_VALUE("flavor"),
-                        FLB_LOG_EVENT_INT32_VALUE(event.remote_thread_create.thread_state->flavor));
+                        FLB_LOG_EVENT_INT32_VALUE(rtc->thread_state->flavor));
                     flb_log_event_encoder_body_commit_map(encoder);
                 } else {
                     flb_log_event_encoder_append_body_null(encoder);
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_XP_MALWARE_DETECTED: {
                 es_event_xp_malware_detected_t *xp = event.xp_malware_detected;
                 if (!xp) break;
