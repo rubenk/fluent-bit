@@ -1192,20 +1192,21 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_XPC_CONNECT:
-                if (event.xpc_connect) {
-                    flb_log_event_encoder_body_begin_map(encoder);
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("service_name"),
-                        FLB_LOG_EVENT_STRING_VALUE(event.xpc_connect->service_name.data, event.xpc_connect->service_name.length));
-                    flb_log_event_encoder_append_body_values(
-                        encoder,
-                        FLB_LOG_EVENT_CSTRING_VALUE("service_domain_type"),
-                        FLB_LOG_EVENT_INT32_VALUE(event.xpc_connect->service_domain_type));
-                    flb_log_event_encoder_body_commit_map(encoder);
-                }
+            case ES_EVENT_TYPE_NOTIFY_XPC_CONNECT: {
+                es_event_xpc_connect_t *xpc_connect = event.xpc_connect;
+                if (xpc_connect == NULL) break;
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("service_name"),
+                    FLB_LOG_EVENT_STRING_VALUE(xpc_connect->service_name.data, xpc_connect->service_name.length));
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("service_domain_type"),
+                    FLB_LOG_EVENT_INT32_VALUE(xpc_connect->service_domain_type));
+                flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_PTY_GRANT:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
