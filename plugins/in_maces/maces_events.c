@@ -872,24 +872,26 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_REMOUNT:
+            case ES_EVENT_TYPE_NOTIFY_REMOUNT: {
+                es_event_remount_t *remount = &event.remount;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
                     "statfs");
-                encode_statfs(encoder, event.remount.statfs);
+                encode_statfs(encoder, remount->statfs);
                 if (msg->version >= 8) {
                   flb_log_event_encoder_append_body_values(
                       encoder,
                       FLB_LOG_EVENT_CSTRING_VALUE("remount_flags"),
-                      FLB_LOG_EVENT_UINT64_VALUE(event.remount.remount_flags));
+                      FLB_LOG_EVENT_UINT64_VALUE(remount->remount_flags));
                   flb_log_event_encoder_append_body_values(
                       encoder,
                       FLB_LOG_EVENT_CSTRING_VALUE("disposition"),
-                      FLB_LOG_EVENT_INT32_VALUE(event.remount.disposition));
+                      FLB_LOG_EVENT_INT32_VALUE(remount->disposition));
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_GETATTRLIST:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
