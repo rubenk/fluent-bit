@@ -112,14 +112,16 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_EXIT:
+            case ES_EVENT_TYPE_NOTIFY_EXIT: {
+                es_event_exit_t *exit = &event.exit;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("stat"),
-                    FLB_LOG_EVENT_UINT64_VALUE(event.exit.stat));
+                    FLB_LOG_EVENT_UINT64_VALUE(exit->stat));
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_OPEN:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
