@@ -2034,6 +2034,39 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            case ES_EVENT_TYPE_NOTIFY_SETACL:
+                flb_log_event_encoder_body_begin_map(encoder);
+                flb_log_event_encoder_append_body_cstring(encoder, "target");
+                encode_es_file_t(encoder, event.setacl.target);
+                flb_log_event_encoder_append_body_values(
+                    encoder,
+                    FLB_LOG_EVENT_CSTRING_VALUE("set_or_clear"),
+                    FLB_LOG_EVENT_INT32_VALUE(event.setacl.set_or_clear));
+                if (event.setacl.set_or_clear == ES_SET) {
+                    ssize_t acl_buf_size = acl_size(event.setacl.acl.set);
+                    if (acl_buf_size > 0) {
+                        char *acl_buf = flb_malloc(acl_buf_size);
+                        if (acl_buf) {
+                            if (acl_copy_ext(acl_buf, event.setacl.acl.set, acl_buf_size) != -1) {
+                                acl_t acl_copy = acl_copy_int(acl_buf);
+                                if (acl_copy) {
+                                    char *acl_text = acl_to_text(acl_copy, NULL);
+                                    if (acl_text) {
+                                        flb_log_event_encoder_append_body_values(
+                                            encoder,
+                                            FLB_LOG_EVENT_CSTRING_VALUE("acl"),
+                                            FLB_LOG_EVENT_CSTRING_VALUE(acl_text));
+                                        acl_free(acl_text);
+                                    }
+                                    acl_free(acl_copy);
+                                }
+                            }
+                            flb_free(acl_buf);
+                        }
+                    }
+                }
+                flb_log_event_encoder_body_commit_map(encoder);
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
