@@ -2034,20 +2034,21 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
-            case ES_EVENT_TYPE_NOTIFY_SETACL:
+            case ES_EVENT_TYPE_NOTIFY_SETACL: {
+                es_event_setacl_t *setacl = &event.setacl;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(encoder, "target");
-                encode_es_file_t(encoder, event.setacl.target);
+                encode_es_file_t(encoder, setacl->target);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("set_or_clear"),
-                    FLB_LOG_EVENT_INT32_VALUE(event.setacl.set_or_clear));
-                if (event.setacl.set_or_clear == ES_SET) {
-                    ssize_t acl_buf_size = acl_size(event.setacl.acl.set);
+                    FLB_LOG_EVENT_INT32_VALUE(setacl->set_or_clear));
+                if (setacl->set_or_clear == ES_SET) {
+                    ssize_t acl_buf_size = acl_size(setacl->acl.set);
                     if (acl_buf_size > 0) {
                         char *acl_buf = flb_malloc(acl_buf_size);
                         if (acl_buf) {
-                            if (acl_copy_ext(acl_buf, event.setacl.acl.set, acl_buf_size) != -1) {
+                            if (acl_copy_ext(acl_buf, setacl->acl.set, acl_buf_size) != -1) {
                                 acl_t acl_copy = acl_copy_int(acl_buf);
                                 if (acl_copy) {
                                     char *acl_text = acl_to_text(acl_copy, NULL);
@@ -2067,6 +2068,7 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 }
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_PROC_CHECK:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(encoder, "target");
