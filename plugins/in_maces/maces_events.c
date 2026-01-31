@@ -601,22 +601,24 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_CLONE:
+            case ES_EVENT_TYPE_NOTIFY_CLONE: {
+                es_event_clone_t *clone = &event.clone;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
                     "source");
-                encode_es_file_t(encoder, event.clone.source);
+                encode_es_file_t(encoder, clone->source);
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
                     "target_dir");
-                encode_es_file_t(encoder, event.clone.target_dir);
+                encode_es_file_t(encoder, clone->target_dir);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("target_name"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.clone.target_name.data, event.clone.target_name.length));
+                    FLB_LOG_EVENT_STRING_VALUE(clone->target_name.data, clone->target_name.length));
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_COPYFILE:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
