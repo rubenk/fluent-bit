@@ -293,22 +293,24 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_UIPC_BIND:
+            case ES_EVENT_TYPE_NOTIFY_UIPC_BIND: {
+                es_event_uipc_bind_t *uipc_bind = &event.uipc_bind;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
                     "dir");
-                encode_es_file_t(encoder, event.uipc_bind.dir);
+                encode_es_file_t(encoder, uipc_bind->dir);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("filename"),
-                    FLB_LOG_EVENT_STRING_VALUE(event.uipc_bind.filename.data, event.uipc_bind.filename.length));
+                    FLB_LOG_EVENT_STRING_VALUE(uipc_bind->filename.data, uipc_bind->filename.length));
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("mode"),
-                    FLB_LOG_EVENT_UINT32_VALUE(event.uipc_bind.mode));
+                    FLB_LOG_EVENT_UINT32_VALUE(uipc_bind->mode));
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_UIPC_CONNECT:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
