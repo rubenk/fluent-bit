@@ -846,20 +846,22 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_MOUNT:
+            case ES_EVENT_TYPE_NOTIFY_MOUNT: {
+                es_event_mount_t *mount = &event.mount;
                 flb_log_event_encoder_body_begin_map(encoder);
                 if (msg->version >= 8) {
                     flb_log_event_encoder_append_body_values(
                         encoder,
                         FLB_LOG_EVENT_CSTRING_VALUE("disposition"),
-                        FLB_LOG_EVENT_INT32_VALUE(event.mount.disposition));
+                        FLB_LOG_EVENT_INT32_VALUE(mount->disposition));
                 }
                 flb_log_event_encoder_append_body_cstring(
                     encoder,
                     "statfs");
-                encode_statfs(encoder, event.mount.statfs);
+                encode_statfs(encoder, mount->statfs);
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_UNMOUNT:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_cstring(
