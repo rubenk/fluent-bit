@@ -2377,6 +2377,65 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                     flb_log_event_encoder_body_commit_map(encoder);
                 }
                 break;
+            case ES_EVENT_TYPE_NOTIFY_GATEKEEPER_USER_OVERRIDE:
+                if (event.gatekeeper_user_override) {
+                    flb_log_event_encoder_body_begin_map(encoder);
+                    flb_log_event_encoder_append_body_values(
+                        encoder,
+                        FLB_LOG_EVENT_CSTRING_VALUE("file_type"),
+                        FLB_LOG_EVENT_INT32_VALUE(event.gatekeeper_user_override->file_type));
+                    if (event.gatekeeper_user_override->file_type == ES_GATEKEEPER_USER_OVERRIDE_FILE_TYPE_PATH) {
+                        flb_log_event_encoder_append_body_values(
+                            encoder,
+                            FLB_LOG_EVENT_CSTRING_VALUE("file_path"),
+                            FLB_LOG_EVENT_STRING_VALUE(event.gatekeeper_user_override->file.file_path.data,
+                                                       event.gatekeeper_user_override->file.file_path.length));
+                    } else {
+                        flb_log_event_encoder_append_body_cstring(encoder, "file");
+                        encode_es_file_t(encoder, event.gatekeeper_user_override->file.file);
+                    }
+                    flb_log_event_encoder_append_body_cstring(encoder, "sha256");
+                    if (event.gatekeeper_user_override->sha256) {
+                        char sha256_hex[65];
+                        for (int i = 0; i < 32; i++) {
+                            snprintf(sha256_hex + (i * 2), 3, "%02x",
+                                     (*event.gatekeeper_user_override->sha256)[i]);
+                        }
+                        sha256_hex[64] = '\0';
+                        flb_log_event_encoder_append_body_cstring(encoder, sha256_hex);
+                    } else {
+                        flb_log_event_encoder_append_body_null(encoder);
+                    }
+                    flb_log_event_encoder_append_body_cstring(encoder, "signing_info");
+                    if (event.gatekeeper_user_override->signing_info) {
+                        flb_log_event_encoder_body_begin_map(encoder);
+                        char cdhash_hex[sizeof(es_cdhash_t) * 2 + 1];
+                        for (size_t i = 0; i < sizeof(es_cdhash_t); i++) {
+                            snprintf(cdhash_hex + (i * 2), 3, "%02x",
+                                     event.gatekeeper_user_override->signing_info->cdhash[i]);
+                        }
+                        cdhash_hex[sizeof(es_cdhash_t) * 2] = '\0';
+                        flb_log_event_encoder_append_body_values(
+                            encoder,
+                            FLB_LOG_EVENT_CSTRING_VALUE("cdhash"),
+                            FLB_LOG_EVENT_CSTRING_VALUE(cdhash_hex));
+                        flb_log_event_encoder_append_body_values(
+                            encoder,
+                            FLB_LOG_EVENT_CSTRING_VALUE("signing_id"),
+                            FLB_LOG_EVENT_STRING_VALUE(event.gatekeeper_user_override->signing_info->signing_id.data,
+                                                       event.gatekeeper_user_override->signing_info->signing_id.length));
+                        flb_log_event_encoder_append_body_values(
+                            encoder,
+                            FLB_LOG_EVENT_CSTRING_VALUE("team_id"),
+                            FLB_LOG_EVENT_STRING_VALUE(event.gatekeeper_user_override->signing_info->team_id.data,
+                                                       event.gatekeeper_user_override->signing_info->team_id.length));
+                        flb_log_event_encoder_body_commit_map(encoder);
+                    } else {
+                        flb_log_event_encoder_append_body_null(encoder);
+                    }
+                    flb_log_event_encoder_body_commit_map(encoder);
+                }
+                break;
             default:
                 flb_log_event_encoder_append_body_null(encoder);
                 break;
