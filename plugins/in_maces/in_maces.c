@@ -128,6 +128,16 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
 
     flb_input_set_context(ins, ctx);
 
+    /* Load config map into context */
+    int ret = flb_input_config_map_set(ins, (void *)ctx);
+    if (ret == -1) {
+        flb_plg_error(ins, "Failed to load configuration");
+        pthread_mutex_destroy(&ctx->encoder_mutex);
+        flb_log_event_encoder_destroy(ctx->encoder);
+        flb_free(ctx);
+        return -1;
+    }
+
     /* Parse event types configuration */
     if (parse_events_config(ctx, ins) != 0) {
         flb_plg_error(ins, "Failed to parse event types configuration");

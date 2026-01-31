@@ -25,6 +25,7 @@
 #include <sys/acl.h>
 #include <uuid/uuid.h>
 #include <pthread.h>
+#include <Block.h>
 
 #include "in_maces.h"
 #include "maces_encoders.h"
@@ -2094,5 +2095,5 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
         pthread_mutex_unlock(&ctx->encoder_mutex);
     };
 
-    return handler;
+    return Block_copy(handler);
 }
