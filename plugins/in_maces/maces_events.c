@@ -1207,16 +1207,18 @@ es_handler_block_t maces_create_event_handler(struct flb_maces_config *ctx) {
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
             }
-            case ES_EVENT_TYPE_NOTIFY_PTY_GRANT:
+            case ES_EVENT_TYPE_NOTIFY_PTY_GRANT: {
+                es_event_pty_grant_t *pty_grant = &event.pty_grant;
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
                     encoder,
                     FLB_LOG_EVENT_CSTRING_VALUE("dev_major"),
-                    FLB_LOG_EVENT_INT32_VALUE(major(event.pty_grant.dev)),
+                    FLB_LOG_EVENT_INT32_VALUE(major(pty_grant->dev)),
                     FLB_LOG_EVENT_CSTRING_VALUE("dev_minor"),
-                    FLB_LOG_EVENT_INT32_VALUE(minor(event.pty_grant.dev)));
+                    FLB_LOG_EVENT_INT32_VALUE(minor(pty_grant->dev)));
                 flb_log_event_encoder_body_commit_map(encoder);
                 break;
+            }
             case ES_EVENT_TYPE_NOTIFY_PTY_CLOSE:
                 flb_log_event_encoder_body_begin_map(encoder);
                 flb_log_event_encoder_append_body_values(
