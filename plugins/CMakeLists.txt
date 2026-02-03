@@ -269,6 +269,10 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin"
   REGISTER_IN_PLUGIN("in_node_exporter_metrics")
 endif()
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  REGISTER_IN_PLUGIN("in_maces")
+endif()
+
 REGISTER_IN_PLUGIN("in_kubernetes_events")
 
 if(FLB_KAFKA)
