@@ -189,7 +189,13 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
 
     flb_plg_info(ins, "Endpoint Security Client initialized successfully");
 
-    /* Apply muting configuration before subscribing to events */
+    /* Apply selection (inverted muting) first - requires macOS 13.0+ */
+    if (maces_apply_selection(ctx) < 0) {
+        flb_plg_warn(ins, "Some selection rules failed to apply");
+        /* Continue anyway - partial selection is still useful */
+    }
+
+    /* Apply muting configuration */
     if (maces_apply_muting(ctx) < 0) {
         flb_plg_warn(ins, "Some muting rules failed to apply");
         /* Continue anyway - partial muting is still useful */
@@ -269,6 +275,15 @@ static struct flb_config_map config_map[] = {
      "target (exact target file), target_prefix (target directory). "
      "If events omitted, mutes ALL events for path. "
      "Examples: 'process:/usr/sbin/cfprefsd', 'target_prefix:/tmp/:write,rename'"
+    },
+    {
+     FLB_CONFIG_MAP_SLIST_1, "select", NULL,
+     FLB_CONFIG_MAP_MULT, FLB_TRUE, offsetof(struct flb_maces_config, select_rules),
+     "Select rule: only receive events matching 'type:path' or 'type:path:events'. "
+     "Types: process (exact executable path), process_prefix (executable directory), "
+     "target (exact target file), target_prefix (target directory). "
+     "Inverts muting - events NOT matching are suppressed. Requires macOS 13.0+. "
+     "Examples: 'target_prefix:/Users/me/.ssh:open', 'process:/Applications/Chrome.app/...:exec'"
     },
     {0}
 };

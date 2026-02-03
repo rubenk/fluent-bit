@@ -30,4 +30,16 @@
  */
 int maces_apply_muting(struct flb_maces_config *ctx);
 
+/*
+ * Apply selection (inverted muting) rules to the ES client.
+ * This enables "allowlist" mode - only events matching these rules are received.
+ * Must be called after es_new_client() but before es_subscribe().
+ * Must be called BEFORE maces_apply_muting() if both are used.
+ *
+ * Requires macOS Ventura (13.0) or later.
+ *
+ * Returns 0 on success, -1 if any rules failed to apply.
+ */
+int maces_apply_selection(struct flb_maces_config *ctx);
+
 #endif /* FLB_IN_MACES_MUTING_H */

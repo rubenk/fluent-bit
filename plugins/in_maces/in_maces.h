@@ -39,6 +39,9 @@ struct flb_maces_config {
 
     /* Muting configuration */
     struct mk_list *mute_rules;   /* List of mute rule strings */
+
+    /* Selection configuration (inverted muting) */
+    struct mk_list *select_rules; /* List of select rule strings */
 };
 
 #endif /* FLB_IN_MACES_H */
