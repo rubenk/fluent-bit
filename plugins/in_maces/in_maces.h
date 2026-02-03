@@ -32,10 +32,13 @@ struct flb_maces_config {
     struct flb_log_event_encoder *encoder;
     pthread_mutex_t encoder_mutex;
 
-    /* Configuration */
+    /* Event configuration */
     char *events_str;             /* Comma-separated event type names from config */
     es_event_type_t *events;      /* Parsed array of event types to subscribe */
     size_t events_count;          /* Number of event types in the array */
+
+    /* Muting configuration */
+    struct mk_list *mute_rules;   /* List of mute rule strings */
 };
 
 #endif /* FLB_IN_MACES_H */

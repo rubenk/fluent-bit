@@ -27,6 +27,7 @@
 #include "in_maces.h"
 #include "maces_encoders.h"
 #include "maces_events.h"
+#include "maces_muting.h"
 #include "events.h"
 
 /* Parse comma-separated event types configuration string
@@ -187,6 +188,13 @@ static int in_maces_init(struct flb_input_instance *ins, struct flb_config *conf
     }
 
     flb_plg_info(ins, "Endpoint Security Client initialized successfully");
+
+    /* Apply muting configuration before subscribing to events */
+    if (maces_apply_muting(ctx) < 0) {
+        flb_plg_warn(ins, "Some muting rules failed to apply");
+        /* Continue anyway - partial muting is still useful */
+    }
+
     es_return_t subscribed = es_subscribe(ctx->client, ctx->events, ctx->events_count);
     if(subscribed != ES_RETURN_SUCCESS) {
         flb_plg_error(ins, "Error subscribing to events");
@@ -252,6 +260,15 @@ static struct flb_config_map config_map[] = {
      "od_attribute_value_add, od_attribute_value_remove, od_attribute_set, od_create_user, "
      "od_create_group, od_delete_user, od_delete_group, xpc_connect. "
      "Note: Only NOTIFY_ events are subscribable; AUTH_ events are not supported."
+    },
+    {
+     FLB_CONFIG_MAP_SLIST_1, "mute", NULL,
+     FLB_CONFIG_MAP_MULT, FLB_TRUE, offsetof(struct flb_maces_config, mute_rules),
+     "Mute rule in format 'type:path' or 'type:path:events'. "
+     "Types: process (exact executable path), process_prefix (executable directory), "
+     "target (exact target file), target_prefix (target directory). "
+     "If events omitted, mutes ALL events for path. "
+     "Examples: 'process:/usr/sbin/cfprefsd', 'target_prefix:/tmp/:write,rename'"
     },
     {0}
 };

@@ -2,6 +2,7 @@ set(src
     in_maces.c
     maces_encoders.c
     maces_events.c
+    maces_muting.c
     events.c
     events/exec.c
     events/fork.c
